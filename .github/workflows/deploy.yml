@@ -1,0 +1,64 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci || npm install
+
+      - name: Build Music Player
+        run: npx vite build
+
+      - name: Prepare GitHub Pages Site Directory
+        run: |
+          mkdir -p _site
+          # Copy landing/info website to root of Pages
+          cp -r website/* _site/
+          # Copy built music player web app to /play/
+          mkdir -p _site/play
+          cp -r dist/* _site/play/
+          # Add .nojekyll to prevent GitHub Pages from ignoring files
+          touch _site/.nojekyll
+          # Add fallback for SPA routing
+          cp _site/index.html _site/404.html
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,6 @@
+{
+  "appId": "com.spotify.app",
+  "appName": "Spotify",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

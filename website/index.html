@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AyushMuzic — Experience Music Without Limits</title>
+  <meta name="description" content="AyushMuzic is a next-generation, ad-free, high-fidelity music streaming client with Apple Music liquid glass aesthetics, word-by-word synced lyrics, and viral listening receipts. Available for Android, Windows, macOS, and Linux.">
+  <meta name="keywords" content="AyushMuzic, SimpMusic, music streaming, ad-free music, listening receipt, lyrics sync, Apple Music UI, compose multiplatform, open source music player">
+  <meta name="theme-color" content="#0a0a12">
+  <link rel="icon" type="image/png" href="website/assets/logo.png">
+
+  <!-- Open Graph / Social Meta -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="AyushMuzic — Experience Music Without Limits">
+  <meta property="og:description" content="Next-Gen Ad-Free Music Streaming with Apple Music aesthetics, word-by-word synced lyrics, and viral listening receipts.">
+  <meta property="og:image" content="website/assets/logo.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="website/style.css">
+</head>
+<body>
+
+  <!-- Ambient Glowing Background Lights -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="ambient-glow glow-3"></div>
+
+  <!-- Header / Navigation Bar -->
+  <header class="site-header" id="navbar">
+    <div class="container header-container">
+      <a href="#home" class="brand-logo" aria-label="AyushMuzic Home">
+        <img src="website/assets/logo.png" alt="AyushMuzic Logo" class="brand-icon" width="42" height="42">
+        <span class="brand-text">Ayush<span class="gradient-text">Muzic</span></span>
+        <span class="version-tag">v1.0.8</span>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="nav-links" id="navLinks">
+        <a href="#home" class="nav-link active">Home</a>
+        <a href="#explore" class="nav-link">Explore</a>
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#receipt-section" class="nav-link">Listening Receipt</a>
+        <a href="#download" class="nav-link">Download</a>
+        <a href="#comparison" class="nav-link">Compare</a>
+        <a href="#faq" class="nav-link">FAQ</a>
+        <a href="https://github.com/jaatayushh/ayushmuzic" target="_blank" rel="noopener noreferrer" class="nav-link github-link" title="GitHub Repository">
+          <svg class="icon-svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          <span>GitHub</span>
+        </a>
+      </nav>
+
+      <!-- Action Buttons -->
+      <div class="header-actions">
+        <a href="play/" target="_blank" class="btn btn-sm btn-webplayer" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#fff; margin-right:6px; text-decoration:none; padding:8px 14px; border-radius:50px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px;"><span>▶ Open Web Player</span></a>
+        <a href="#download" class="btn btn-sm btn-primary">
+          <svg class="icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+          </svg>
+          <span>Get AyushMuzic</span>
+        </a>
+        <button class="mobile-toggle" id="mobileMenuBtn" aria-label="Toggle navigation menu" aria-expanded="false">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Dropdown Navigation -->
+  <div class="mobile-nav-overlay" id="mobileNav">
+    <div class="mobile-nav-panel">
+      <div class="mobile-nav-header">
+        <div class="brand-logo">
+          <img src="website/assets/logo.png" alt="AyushMuzic" class="brand-icon" width="36" height="36">
+          <span class="brand-text">Ayush<span class="gradient-text">Muzic</span></span>
+        </div>
+        <button class="mobile-close-btn" id="mobileCloseBtn" aria-label="Close menu">&times;</button>
+      </div>
+      <nav class="mobile-menu">
+        <a href="#home" class="mobile-menu-item">Home</a>
+        <a href="#explore" class="mobile-menu-item">Explore Showcase</a>
+        <a href="#features" class="mobile-menu-item">Features</a>
+        <a href="#receipt-section" class="mobile-menu-item">Listening Receipt</a>
+        <a href="#download" class="mobile-menu-item">Download Hub</a>
+        <a href="#comparison" class="mobile-menu-item">Compare</a>
+        <a href="#faq" class="mobile-menu-item">FAQ</a>
+        <a href="https://github.com/jaatayushh/ayushmuzic" target="_blank" rel="noopener noreferrer" class="mobile-menu-item">
+          GitHub Repository
+        </a>
+      </nav>
+      <div class="mobile-nav-cta">
+        <a href="play/" class="btn btn-secondary btn-block" style="margin-bottom:8px">▶ Open Web Player (/play)</a>
+        <a href="#download" class="btn btn-primary btn-block">Download AyushMuzic v1.0.8</a>
+      </div>
+    </div>
+  </div>
+
+  <main id="main-content">
+
+    <!-- ============================================================== -->
+    <!-- HERO SECTION: Bold Headline & TWO PROMINENT PRIMARY BUTTONS    -->
+    <!-- ============================================================== -->
+    <section class="hero-section" id="home">
+      <div class="container hero-container">
+        
+        <div class="hero-content">
+          <!-- Release Badge -->
+          <div class="hero-pill-badge">
+            <span class="pulse-indicator"></span>
+            <span class="badge-text">v1.0.8 Released • Cross-Platform Audiophile Experience</span>
+            <svg class="chevron-right" viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+
+          <!-- Bold Main Headline -->
+          <h1 class="hero-headline">
+            Experience Music <br>
+            <span class="gradient-title">Without Limits.</span>
+          </h1>
+
+          <!-- Compelling Subtitle -->
+          <p class="hero-subtitle">
+            AyushMuzic brings the entire YouTube Music catalog wrapped in Apple Music liquid glass aesthetics, word-by-word synced lyrics, audiophile acoustics, and the viral listening receipt. 
+            <strong>Zero advertisements. No paywalls. 100% Free & Open Source.</strong>
+          </p>
+
+          <!-- PROMINENT TWO PRIMARY BUTTONS (REQUIRED) -->
+          <div class="hero-actions-dual">
+            <!-- PRIMARY OPTION 1: EXPLORE -->
+            <a href="#explore" class="btn btn-hero btn-explore" id="heroBtnExplore">
+              <div class="btn-glow-layer"></div>
+              <div class="btn-content">
+                <span class="btn-number-badge">1</span>
+                <span class="btn-main-label">Explore</span>
+                <svg class="icon-svg btn-arrow" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+                </svg>
+              </div>
+              <span class="btn-subtext">Interactive Player & Receipt</span>
+            </a>
+
+            <!-- PRIMARY OPTION 2: DOWNLOAD -->
+            <a href="#download" class="btn btn-hero btn-download" id="heroBtnDownload">
+              <div class="btn-glow-layer"></div>
+              <div class="btn-content">
+                <span class="btn-number-badge">2</span>
+                <span class="btn-main-label">Download</span>
+                <svg class="icon-svg btn-arrow" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+              </div>
+              <span class="btn-subtext">Android, Windows, macOS & Linux</span>
+            </a>
+          </div>
+
+          <!-- Feature Bullets / Trust Badges -->
+          <div class="hero-badges-row">
+            <div class="hero-badge-item">
+              <svg class="badge-icon text-emerald" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+              <span>Zero Ads & SponsorBlock</span>
+            </div>
+            <div class="hero-badge-item">
+              <svg class="badge-icon text-cyan" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+              <span>Background & Screen-off Play</span>
+            </div>
+            <div class="hero-badge-item">
+              <svg class="badge-icon text-purple" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+              <span>No Account Required</span>
+            </div>
+            <div class="hero-badge-item">
+              <svg class="badge-icon text-rose" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+              <span>GPLv3 Open Source</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Visual: Device Mockup & Floating Cards -->
+        <div class="hero-visual">
+          <div class="device-frame glass-panel">
+            <div class="device-notch"></div>
+            <div class="device-screen">
+              
+              <!-- Simulated App Now Playing Header -->
+              <div class="mock-app-header">
+                <span class="mock-btn-dot"></span>
+                <span class="mock-header-title">NOW PLAYING • AYUSHMUZIC</span>
+                <span class="mock-btn-dot"></span>
+              </div>
+
+              <!-- Artwork with Ambient Liquid Blur -->
+              <div class="mock-artwork-wrap">
+                <div class="mock-art-blur"></div>
+                <div class="mock-art-img">
+                  <img src="website/assets/starboy_square.jpg" alt="AyushMuzic Player Artwork" class="mock-art-actual" onerror="this.src='website/assets/logo.png'">
+                  <div class="mock-now-playing-badge">
+                    <span class="equalizer-bar"></span>
+                    <span class="equalizer-bar"></span>
+                    <span class="equalizer-bar"></span>
+                    <span>256 kbps High-Res</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Track Details -->
+              <div class="mock-track-info">
+                <div class="mock-title-row">
+                  <div>
+                    <h3 class="mock-song-title">Starboy</h3>
+                    <p class="mock-artist-name">The Weeknd, Daft Punk</p>
+                  </div>
+                  <div class="mock-heart-btn active">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="#ec4899">
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                  </div>
+                </div>
+
+                <!-- Animated Scrubber -->
+                <div class="mock-scrubber">
+                  <div class="mock-progress-track">
+                    <div class="mock-progress-fill" style="width: 58%;">
+                      <div class="mock-progress-thumb"></div>
+                    </div>
+                  </div>
+                  <div class="mock-time-labels">
+                    <span>2:14</span>
+                    <span>3:50</span>
+                  </div>
+                </div>
+
+                <!-- Playback Controls -->
+                <div class="mock-controls">
+                  <button class="mock-ctrl-btn" aria-label="Shuffle">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
+                  </button>
+                  <button class="mock-ctrl-btn" aria-label="Previous">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                  </button>
+                  <button class="mock-play-btn" aria-label="Play / Pause">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="#000"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                  </button>
+                  <button class="mock-ctrl-btn" aria-label="Next">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                  </button>
+                  <button class="mock-ctrl-btn" aria-label="Repeat">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Floating Badge 1: Viral Receipt Preview -->
+          <div class="floating-badge badge-receipt glass-card">
+            <div class="badge-icon-box">🧾</div>
+            <div class="badge-text-box">
+              <span class="badge-title">AYUSHMUZIC RECEIPT</span>
+              <span class="badge-desc">Auto-generated monthly breakdown</span>
+            </div>
+            <span class="badge-pill">NEW</span>
+          </div>
+
+          <!-- Floating Badge 2: Apple Music Synced Lyrics -->
+          <div class="floating-badge badge-lyrics glass-card">
+            <div class="badge-icon-box">🎤</div>
+            <div class="badge-text-box">
+              <span class="badge-title">Syllable Synced Lyrics</span>
+              <span class="badge-desc">Apple Music liquid blur experience</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- STATS / METRICS BANNER                                         -->
+    <!-- ============================================================== -->
+    <section class="stats-banner">
+      <div class="container stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">100M+</div>
+          <div class="stat-label">Tracks in Catalog</div>
+          <div class="stat-sub">YouTube Music backend sync</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number stat-highlight">0</div>
+          <div class="stat-label">Ads & Paywalls</div>
+          <div class="stat-sub">Pure uninterrupted playback</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">256 <span class="unit">kbps</span></div>
+          <div class="stat-label">Audiophile Sound</div>
+          <div class="stat-sub">Opus & AAC with AutoEq</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">5+</div>
+          <div class="stat-label">Platforms Supported</div>
+          <div class="stat-sub">Android, Windows, TV & Desktop</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- CORE FEATURES GRID (simpmusic.org complete coverage)            -->
+    <!-- ============================================================== -->
+    <section class="features-section" id="features">
+      <div class="container">
+        
+        <div class="section-header text-center">
+          <span class="section-tag">Powerful Features</span>
+          <h2 class="section-title">Everything You Need In A <br><span class="gradient-text">Modern Music Player</span></h2>
+          <p class="section-desc">Designed with obsession for audiophiles, privacy advocates, and music lovers who refuse to compromise.</p>
+        </div>
+
+        <div class="features-grid">
+          
+          <!-- Feature 1 -->
+          <div class="feature-card glass-panel">
+            <div class="feature-icon-wrapper icon-bg-purple">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Background Playback & High-Res Audio</h3>
+            <p class="feature-desc">
+              Listen without screen lock restrictions. Enjoy seamless crossfade blending, gapless track transitions, and clean 256kbps audio streams with negligible buffering.
+            </p>
+            <ul class="feature-points">
+              <li>Screen-off background playback</li>
+              <li>Seamless gapless & crossfade engine</li>
+              <li>ReplayGain volume normalization</li>
+            </ul>
+          </div>
+
+          <!-- Feature 2 -->
+          <div class="feature-card glass-panel">
+            <div class="feature-icon-wrapper icon-bg-cyan">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">High-Speed Catalog Browsing</h3>
+            <p class="feature-desc">
+              Browse Home recommendations, Global Top Charts, Moods, Genres, and Podcasts with zero latency. Dynamic shelves generate instant smart radio queues without requiring a login.
+            </p>
+            <ul class="feature-points">
+              <li>Top 100 Billboard & Viral Charts</li>
+              <li>Curated Moods, Workouts & Focus shelves</li>
+              <li>Infinite instant radio station generation</li>
+            </ul>
+          </div>
+
+          <!-- Feature 3 -->
+          <div class="feature-card glass-panel">
+            <div class="feature-icon-wrapper icon-bg-pink">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5-3c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Synced & Translated Lyrics</h3>
+            <p class="feature-desc">
+              Experience Apple Music-grade syllable-by-syllable synchronized karaoke lyrics. Features real-time AI translations, romanization, and one-tap shareable lyric card export.
+            </p>
+            <ul class="feature-points">
+              <li>Real-time word & syllable glow sync</li>
+              <li>Multi-language instant translation</li>
+              <li>Export lyric snippet cards as images</li>
+            </ul>
+          </div>
+
+          <!-- Feature 4: FEATURED RECEIPT HIGHLIGHT -->
+          <div class="feature-card glass-panel featured-card">
+            <div class="card-highlight-glow"></div>
+            <div class="feature-badge-top">VIRAL FAVORITE</div>
+            <div class="feature-icon-wrapper icon-bg-amber">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Analytics & Listening Receipt</h3>
+            <p class="feature-desc">
+              Generate iconic Receiptify-style thermal paper receipts branded with <strong>AYUSHMUZIC</strong>. Track your top tracks, total hours, play counts, and auth barcodes 100% on-device.
+            </p>
+            <ul class="feature-points">
+              <li>Authentic thermal receipt with barcode</li>
+              <li>7-Day, 30-Day, and All-Time breakdowns</li>
+              <li>100% private local listening analytics</li>
+            </ul>
+            <a href="#receipt-section" class="card-action-link">
+              <span>Try Live Receipt Generator</span>
+              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+            </a>
+          </div>
+
+          <!-- Feature 5 -->
+          <div class="feature-card glass-panel">
+            <div class="feature-icon-wrapper icon-bg-emerald">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">SponsorBlock & Ad-Free Privacy</h3>
+            <p class="feature-desc">
+              Autonomous SponsorBlock integration skips sponsor announcements, non-music video intros, and outro plugs automatically. Zero telemetry, zero tracking, and no Google account required.
+            </p>
+            <ul class="feature-points">
+              <li>Auto-skips sponsors, intros & silence</li>
+              <li>No Google or YouTube login required</li>
+              <li>Return YouTube Dislike integration</li>
+            </ul>
+          </div>
+
+          <!-- Feature 6 -->
+          <div class="feature-card glass-panel">
+            <div class="feature-icon-wrapper icon-bg-blue">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                <path d="M4 6h16v10H4zm14 12c.55 0 1-.45 1-1v-1H5v1c0 .55.45 1 1 1h12zm-3-6H9V8h6v4z"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Android Auto & Multi-Platform</h3>
+            <p class="feature-desc">
+              Engineered with Kotlin Compose Multiplatform. Seamless in-car dashboard control with Android Auto, native libmpv engine for Windows, and cross-platform desktop support.
+            </p>
+            <ul class="feature-points">
+              <li>Android Auto in-vehicle dashboard support</li>
+              <li>Native Windows MSI with libmpv backend</li>
+              <li>macOS and Linux desktop builds</li>
+            </ul>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- INTERACTIVE SHOWCASE (EXPLORE HUB)                             -->
+    <!-- Apple Music Player, Synced Lyrics & Viral Listening Receipt    -->
+    <!-- ============================================================== -->
+    <section class="showcase-section" id="explore">
+      <div class="container">
+        
+        <div class="section-header text-center">
+          <span class="section-tag">Interactive Playground</span>
+          <h2 class="section-title">Explore The <span class="gradient-text">AyushMuzic Interface</span></h2>
+          <p class="section-desc">Experience the liquid glass aesthetics, synchronized lyrics engine, and viral listening receipts right in your browser.</p>
+        </div>
+
+        <!-- Showcase Tab Selectors -->
+        <div class="showcase-tabs-nav">
+          <button class="showcase-tab-btn active" data-tab="tab-player">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+            <span>Apple Music Player & Lyrics</span>
+          </button>
+          <button class="showcase-tab-btn" data-tab="tab-receipt" id="tabReceiptBtn">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            <span>Viral Listening Receipt</span>
+            <span class="tab-highlight-pill">POPULAR</span>
+          </button>
+          <button class="showcase-tab-btn" data-tab="tab-equalizer">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
+            <span>Audiophile 10-Band EQ</span>
+          </button>
+        </div>
+
+        <!-- TAB 1: PLAYER & SYNCED LYRICS -->
+        <div class="showcase-tab-content active" id="tab-player">
+          <div class="interactive-player-grid">
+            
+            <!-- Player Controller -->
+            <div class="player-card glass-panel" id="interactivePlayer">
+              <div class="player-top-bar">
+                <span class="playing-from">PLAYING FROM AYUSHMUZIC TOP HITS</span>
+                <div class="badge-hq">256 kbps OPUS</div>
+              </div>
+
+              <!-- Artwork with Real-Time Dynamic Glow -->
+              <div class="player-art-stage">
+                <div class="dynamic-art-halo" id="artHalo"></div>
+                <img src="website/assets/starboy_square.jpg" alt="Starboy Album Art" class="player-art-img" id="currentTrackArt" onerror="this.src='website/assets/logo.png'">
+              </div>
+
+              <!-- Real Audio Engine -->
+              <audio id="audioPlayer" preload="auto" src="website/assets/starboy.mp3"></audio>
+
+              <!-- Track Metadata -->
+              <div class="player-meta-row">
+                <div class="player-meta-texts">
+                  <h3 class="track-title" id="currentTrackTitle">Starboy</h3>
+                  <p class="track-artist" id="currentTrackArtist">The Weeknd ft. Daft Punk</p>
+                </div>
+                <button class="track-favorite-btn active" id="favoriteBtn" aria-label="Add to favorites">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="#ec4899">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Scrubber Bar -->
+              <div class="player-scrubber-box">
+                <div class="scrubber-bar" id="scrubberBar">
+                  <div class="scrubber-progress" id="scrubberProgress" style="width: 32%;">
+                    <span class="scrubber-knob"></span>
+                  </div>
+                </div>
+                <div class="scrubber-timestamps">
+                  <span id="timeCurrent">1:14</span>
+                  <span id="timeTotal">3:50</span>
+                </div>
+              </div>
+
+              <!-- Player Primary Controls -->
+              <div class="player-primary-controls">
+                <button class="ctrl-action-btn" id="btnShuffle" title="Shuffle">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
+                </button>
+                <button class="ctrl-action-btn" id="btnPrev" title="Previous Track">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                </button>
+                <button class="ctrl-play-btn" id="btnPlayPause" title="Play / Pause">
+                  <svg id="playIcon" viewBox="0 0 24 24" width="26" height="26" fill="#000"><path d="M8 5v14l11-7z"/></svg>
+                  <svg id="pauseIcon" class="hidden" viewBox="0 0 24 24" width="26" height="26" fill="#000"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </button>
+                <button class="ctrl-action-btn" id="btnNext" title="Next Track">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                </button>
+                <button class="ctrl-action-btn" id="btnRepeat" title="Repeat Track">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+                </button>
+              </div>
+
+              <!-- Track Switcher Pills -->
+              <div class="track-switcher-box">
+                <span class="switcher-title">Select Demo Song:</span>
+                <div class="switcher-chips">
+                  <button class="chip-btn active" data-song="0">Starboy</button>
+                  <button class="chip-btn" data-song="1">Blinding Lights</button>
+                  <button class="chip-btn" data-song="2">As It Was</button>
+                  <button class="chip-btn" data-song="3">Midnight City</button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Apple Music Synced Lyrics Sheet -->
+            <div class="lyrics-card glass-panel">
+              <div class="lyrics-header">
+                <div class="lyrics-title-box">
+                  <span class="karaoke-dot"></span>
+                  <h4>Real-Time Synced Lyrics</h4>
+                </div>
+                <div class="lyrics-badges">
+                  <span class="lyrics-badge">Apple Music Blur</span>
+                  <span class="lyrics-badge">LRCLIB Sync</span>
+                </div>
+              </div>
+
+              <!-- Synced Lyrics Scroll Area -->
+              <div class="lyrics-scroll-container" id="lyricsContainer">
+                <!-- Lines injected dynamically via JavaScript -->
+              </div>
+
+              <div class="lyrics-footer">
+                <span class="lyrics-source">Syllable sync powered by AyushMuzic AI Lyrics Engine</span>
+                <button class="btn btn-xs btn-outline" id="btnShareLyrics">Share Lyric Card</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- TAB 2: VIRAL LISTENING RECEIPT (RECEIPTIFY / AYUSHMUZIC HIGHLIGHT) -->
+        <div class="showcase-tab-content" id="tab-receipt">
+          <div class="receipt-showcase-wrapper" id="receipt-section">
+            
+            <!-- Receipt Controls Sidebar -->
+            <div class="receipt-controls-panel glass-panel">
+              <div class="panel-badge">OFFICIAL ANALYTICS FEATURE</div>
+              <h3 class="panel-heading">Your Listening Receipt</h3>
+              <p class="panel-desc">
+                AyushMuzic computes your true on-device listening graph and prints a vintage thermal register receipt. 
+                Everything is calculated locally with zero cloud telemetry.
+              </p>
+
+              <!-- Period Selectors -->
+              <div class="control-group">
+                <label class="control-label">Time Period</label>
+                <div class="period-toggle-group">
+                  <button class="period-btn active" data-period="week">Last 7 Days</button>
+                  <button class="period-btn" data-period="month">Last 30 Days</button>
+                  <button class="period-btn" data-period="all">All Time</button>
+                </div>
+              </div>
+
+              <!-- Cardholder Name Input -->
+              <div class="control-group">
+                <label class="control-label" for="receiptCardholderInput">Cardholder / Listener Name</label>
+                <input type="text" id="receiptCardholderInput" class="input-glass" value="AYUSH" maxlength="24">
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="receipt-actions">
+                <button class="btn btn-primary btn-block" id="btnDownloadReceipt">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                  <span>Download Receipt (PNG)</span>
+                </button>
+                <button class="btn btn-outline btn-block" id="btnCopyReceiptText">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                  <span>Copy Receipt Summary</span>
+                </button>
+              </div>
+
+              <div class="privacy-note">
+                <svg viewBox="0 0 20 20" fill="#10b981" width="14" height="14"><path fill-rule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zM11 14a1 1 0 11-2 0 1 1 0 012 0zm0-7a1 1 0 10-2 0v3a1 1 0 102 0V7z" clip-rule="evenodd"/></svg>
+                <span>Calculated purely from your on-device playback history.</span>
+              </div>
+            </div>
+
+            <!-- The Real Listening Receipt (Thermal Paper Mockup) -->
+            <div class="receipt-paper-container">
+              <div class="receipt-paper" id="printableReceipt">
+                
+                <!-- Jagged Top Tear Edge -->
+                <div class="receipt-jagged-top"></div>
+
+                <!-- Receipt Brand Header (REQUIREMENT: Shows AYUSHMUZIC) -->
+                <div class="receipt-header-section">
+                  <h2 class="receipt-main-title">AYUSHMUZIC</h2>
+                  <p class="receipt-period-text" id="receiptPeriodLabel">LAST 7 DAYS</p>
+                </div>
+
+                <!-- Order and Date Meta -->
+                <div class="receipt-meta-block">
+                  <div class="receipt-meta-line" id="receiptOrderLine">ORDER #0842 FOR AYUSH</div>
+                  <div class="receipt-meta-line" id="receiptDateLine">THURSDAY, OCTOBER 15, 2026</div>
+                </div>
+
+                <!-- Dashed Separator -->
+                <div class="receipt-dashed-divider"></div>
+
+                <!-- Table Header -->
+                <div class="receipt-table-header">
+                  <span class="col-qty">QTY</span>
+                  <span class="col-item">ITEM</span>
+                  <span class="col-amt">AMT</span>
+                </div>
+
+                <!-- Dashed Separator -->
+                <div class="receipt-dashed-divider"></div>
+
+                <!-- Song Rows Container -->
+                <div class="receipt-items-list" id="receiptItemsContainer">
+                  <!-- Injected via JavaScript -->
+                </div>
+
+                <!-- Dashed Separator -->
+                <div class="receipt-dashed-divider"></div>
+
+                <!-- Totals -->
+                <div class="receipt-totals-block">
+                  <div class="receipt-summary-row">
+                    <span>ITEM COUNT:</span>
+                    <span id="receiptItemCount">182</span>
+                  </div>
+                  <div class="receipt-summary-row">
+                    <span>TOTAL:</span>
+                    <span id="receiptTotalDuration">10:48:15</span>
+                  </div>
+                </div>
+
+                <!-- Dashed Separator -->
+                <div class="receipt-dashed-divider"></div>
+
+                <!-- Card Details -->
+                <div class="receipt-card-block">
+                  <div class="receipt-card-line">CARD #: **** **** **** 2026</div>
+                  <div class="receipt-card-line" id="receiptAuthLine">AUTH CODE: 849201</div>
+                  <div class="receipt-card-line" id="receiptCardholderLine">CARDHOLDER: AYUSH</div>
+                </div>
+
+                <!-- Thank You Note -->
+                <div class="receipt-thanks-note">
+                  THANK YOU FOR LISTENING!
+                </div>
+
+                <!-- Algorithmic Barcode Graphic -->
+                <div class="receipt-barcode-wrap">
+                  <div class="receipt-barcode" id="receiptBarcodeSvg">
+                    <!-- Dynamic barcode lines generated by JS -->
+                  </div>
+                  <div class="receipt-barcode-number">0842 1040 2026 8492</div>
+                </div>
+
+                <!-- Receipt Branding Footer (REQUIREMENT: Shows ayushmuzic) -->
+                <div class="receipt-footer-brand">
+                  ayushmuzic
+                </div>
+
+                <!-- Jagged Bottom Tear Edge -->
+                <div class="receipt-jagged-bottom"></div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- TAB 3: EQUALIZER & SOUNDSTAGE -->
+        <div class="showcase-tab-content" id="tab-equalizer">
+          <div class="equalizer-showcase-grid glass-panel">
+            
+            <div class="eq-header-row">
+              <div>
+                <h3 class="eq-title">Audiophile 10-Band Graphic Equalizer</h3>
+                <p class="eq-subtitle">Calibrate frequencies to your exact headphones or choose hand-tuned acoustic presets.</p>
+              </div>
+              <div class="eq-presets-row">
+                <span class="preset-label">Preset:</span>
+                <button class="preset-btn active" data-preset="bass">Bass Boost</button>
+                <button class="preset-btn" data-preset="rock">Rock</button>
+                <button class="preset-btn" data-preset="pop">Pop</button>
+                <button class="preset-btn" data-preset="vocal">Vocal</button>
+                <button class="preset-btn" data-preset="flat">Flat</button>
+              </div>
+            </div>
+
+            <!-- 10 Sliders -->
+            <div class="eq-sliders-board">
+              <div class="eq-slider-col">
+                <span class="db-val" id="db-31">+6 dB</span>
+                <input type="range" min="-12" max="12" value="6" class="eq-range" id="slider-31" orient="vertical">
+                <span class="freq-label">31 Hz</span>
+              </div>
+              <div class="eq-slider-col">
+                <span class="db-val" id="db-62">+5 dB</span>
+                <input type="range" min="-12" max="12" value="5" class="eq-range" id="slider-62">
+                <span class="freq-label">62 Hz</span>
+              </div>
+              <div class="eq-slider-col">
+                <span class="db-val" id="db-125">+3 dB</span>
+                <input type="range" min="-12" max="12" value="3" class="eq-range" id="slider-125">
+                <span class="freq-label">125 Hz</span>
+              </div>
+              <div class="eq-slider-col">
+                <span class="db-val" id="db-250">+1 dB</span>
+                <input type="range" min="-12" max="12" value="1" class="eq-range" id="slider-250">
+                <span class="freq-label">250 Hz</span>
+              </div>
+              <div class="eq-slider-col">
+                <span class="db-val" id="db-500">0 dB</span>
+                <input type="range" min="-12" max="12" value="0" class="eq-range" id="slider-500">
+                <span class="freq-label">500 Hz</span>
+              </div>
+              <div class="eq-slider-col">
+                <span class="db-val" id="db-1k">0 dB</span>
+                <input type="range" min="-12" max="12" value="0" class="eq-range" id="slider-1k">
+                <span class="freq-label">1 kHz</span>
+              </div>
+              <div class="eq-slider-col">
+                <span class="db-val" id="db-2k">+2 dB</span>
+                <input type="range" min="-12" max="12" value="2" class="eq-range" id="slider-2k">
+                <span class="freq-label">2 kHz</span>
+              </div>
+              <div class="eq-slider-col">
+                <span class="db-val" id="db-4k">+3 dB</span>
+                <input type="range" min="-12" max="12" value="3" class="eq-range" id="slider-4k">
+                <span class="freq-label">4 kHz</span>
+              </div>
+              <div class="eq-slider-col">
+                <span class="db-val" id="db-8k">+4 dB</span>
+                <input type="range" min="-12" max="12" value="4" class="eq-range" id="slider-8k">
+                <span class="freq-label">8 kHz</span>
+              </div>
+              <div class="eq-slider-col">
+                <span class="db-val" id="db-16k">+5 dB</span>
+                <input type="range" min="-12" max="12" value="5" class="eq-range" id="slider-16k">
+                <span class="freq-label">16 kHz</span>
+              </div>
+            </div>
+
+            <!-- AutoEq and Crossfade Footers -->
+            <div class="eq-footer-options">
+              <div class="eq-opt-card">
+                <div class="eq-opt-icon">🎧</div>
+                <div>
+                  <h4 class="opt-name">AutoEq Headphone Calibration</h4>
+                  <p class="opt-desc">Matches the exact Harman target response for Sony WH-1000XM5, AirPods, Sennheiser, and 4,000+ models.</p>
+                </div>
+              </div>
+              <div class="eq-opt-card">
+                <div class="eq-opt-icon">🎛️</div>
+                <div>
+                  <h4 class="opt-name">Dynamic Crossfade (3.5s)</h4>
+                  <p class="opt-desc">Smooth logarithmic volume ducking and blending between tracks without jarring pauses.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- MULTI-PLATFORM DOWNLOAD HUB                                    -->
+    <!-- Android, Windows, Linux, macOS                                 -->
+    <!-- ============================================================== -->
+    <section class="download-section" id="download">
+      <div class="container">
+        
+        <div class="section-header text-center">
+          <span class="section-tag">Installers & Packages</span>
+          <h2 class="section-title">Download <span class="gradient-text">AyushMuzic v1.0.8</span></h2>
+          <p class="section-desc">Standalone, verified builds. Zero trackers, zero ads, no dependencies required.</p>
+        </div>
+
+        <!-- Platform Tabs -->
+        <div class="platform-tabs-nav" id="platformNav">
+          <button class="platform-tab-btn active" data-platform="android">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.27-.86-.31-.16-.69-.04-.86.27l-1.89 3.26C14.94 8.37 13.5 8 12 8s-2.94.37-4.42.97L5.69 5.71c-.17-.31-.55-.43-.86-.27-.31.16-.43.55-.27.86l1.84 3.18C3.81 11.23 2 14.39 2 18h20c0-3.61-1.81-6.77-4.4-8.52zM7 15.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25zm10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg>
+            <span>Android</span>
+          </button>
+          <button class="platform-tab-btn" data-platform="windows">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+            <span>Windows</span>
+          </button>
+          <button class="platform-tab-btn" data-platform="desktop-other">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+            <span>Linux & macOS</span>
+          </button>
+        </div>
+
+        <!-- TAB 1: ANDROID DOWNLOADS -->
+        <div class="platform-tab-pane active" id="pane-android">
+          <div class="download-cards-grid">
+            
+            <!-- Android Universal APK -->
+            <div class="download-card glass-panel">
+              <div class="card-badge-status">RECOMMENDED FOR ALL</div>
+              <div class="dl-card-header">
+                <div class="dl-platform-icon icon-android">
+                  <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.27-.86-.31-.16-.69-.04-.86.27l-1.89 3.26C14.94 8.37 13.5 8 12 8s-2.94.37-4.42.97L5.69 5.71c-.17-.31-.55-.43-.86-.27-.31.16-.43.55-.27.86l1.84 3.18C3.81 11.23 2 14.39 2 18h20c0-3.61-1.81-6.77-4.4-8.52zM7 15.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25zm10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg>
+                </div>
+                <div>
+                  <h3 class="dl-package-name">AyushMuzic Universal APK</h3>
+                  <p class="dl-package-sub">Compatible with all Android devices (API 26+)</p>
+                </div>
+              </div>
+
+              <div class="dl-meta-list">
+                <div class="dl-meta-row">
+                  <span class="meta-name">File Version</span>
+                  <span class="meta-val">v1.0.8 Release</span>
+                </div>
+                <div class="dl-meta-row">
+                  <span class="meta-name">File Size</span>
+                  <span class="meta-val">~53.8 MB</span>
+                </div>
+                <div class="dl-meta-row">
+                  <span class="meta-name">Target OS</span>
+                  <span class="meta-val">Android 8.0 to Android 15</span>
+                </div>
+              </div>
+
+              <!-- Real SHA-256 Checksum -->
+              <div class="checksum-box">
+                <span class="checksum-label">SHA-256 CHECKSUM</span>
+                <code class="checksum-text" id="hashUniversal">A8AF9865748BA76E7A32C58A8512613182E2D93D49EBDD8B2CD869B42C72A3C6</code>
+                <button class="copy-hash-btn" data-target="hashUniversal" title="Copy Checksum">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                  <span>Copy</span>
+                </button>
+              </div>
+
+              <!-- Buttons -->
+              <div class="dl-card-actions">
+                <a href="/downloads/AyushMuzic-v1.0.8-universal.apk" download="AyushMuzic-v1.0.8-universal.apk" class="btn btn-primary btn-block">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                  <span>Direct Download APK</span>
+                </a>
+                <a href="https://github.com/jaatayushh/ayushmuzic/releases/latest" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-block">
+                  <span>GitHub Mirror</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Android ARM64 APK -->
+            <div class="download-card glass-panel">
+              <div class="card-badge-status status-fast">FASTER & LIGHTWEIGHT</div>
+              <div class="dl-card-header">
+                <div class="dl-platform-icon icon-android">
+                  <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.27-.86-.31-.16-.69-.04-.86.27l-1.89 3.26C14.94 8.37 13.5 8 12 8s-2.94.37-4.42.97L5.69 5.71c-.17-.31-.55-.43-.86-.27-.31.16-.43.55-.27.86l1.84 3.18C3.81 11.23 2 14.39 2 18h20c0-3.61-1.81-6.77-4.4-8.52zM7 15.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25zm10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg>
+                </div>
+                <div>
+                  <h3 class="dl-package-name">AyushMuzic ARM64 APK</h3>
+                  <p class="dl-package-sub">Optimized for modern 64-bit phones (Snapdragon, Tensor, Dimensity)</p>
+                </div>
+              </div>
+
+              <div class="dl-meta-list">
+                <div class="dl-meta-row">
+                  <span class="meta-name">File Version</span>
+                  <span class="meta-val">v1.0.8 Release</span>
+                </div>
+                <div class="dl-meta-row">
+                  <span class="meta-name">File Size</span>
+                  <span class="meta-val">~27.7 MB (Ultra Compact)</span>
+                </div>
+                <div class="dl-meta-row">
+                  <span class="meta-name">Target Arch</span>
+                  <span class="meta-val">arm64-v8a Architecture</span>
+                </div>
+              </div>
+
+              <!-- Real SHA-256 Checksum -->
+              <div class="checksum-box">
+                <span class="checksum-label">SHA-256 CHECKSUM</span>
+                <code class="checksum-text" id="hashArm64">4C1ABAAA6092EFFDE5CE1E56897E3E51974F2B998B6315E42EAC823BE4849D1E</code>
+                <button class="copy-hash-btn" data-target="hashArm64" title="Copy Checksum">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                  <span>Copy</span>
+                </button>
+              </div>
+
+              <!-- Buttons -->
+              <div class="dl-card-actions">
+                <a href="/downloads/AyushMuzic-v1.0.8-arm64.apk" download="AyushMuzic-v1.0.8-arm64.apk" class="btn btn-primary btn-block">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                  <span>Download ARM64 APK</span>
+                </a>
+                <a href="https://github.com/jaatayushh/ayushmuzic/releases/latest" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-block">
+                  <span>GitHub Mirror</span>
+                </a>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Android Install Instructions Card -->
+          <div class="install-guide-card glass-panel">
+            <h4 class="guide-title">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+              <span>How to Install on Android</span>
+            </h4>
+            <div class="guide-steps-grid">
+              <div class="step-col">
+                <span class="step-num">01</span>
+                <h5>Download APK</h5>
+                <p>Tap either Universal or ARM64 above to begin download on your device.</p>
+              </div>
+              <div class="step-col">
+                <span class="step-num">02</span>
+                <h5>Allow Installation</h5>
+                <p>When prompted by your browser, enable "Install unknown apps" in Settings.</p>
+              </div>
+              <div class="step-col">
+                <span class="step-num">03</span>
+                <h5>Enjoy Music</h5>
+                <p>Open AyushMuzic and start streaming with zero ads and synced lyrics instantly.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: WINDOWS DOWNLOADS -->
+        <div class="platform-tab-pane" id="pane-windows">
+          <div class="download-cards-grid">
+            
+            <div class="download-card glass-panel windows-featured">
+              <div class="card-badge-status">OFFICIAL MSI INSTALLER</div>
+              <div class="dl-card-header">
+                <div class="dl-platform-icon icon-windows">
+                  <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+                </div>
+                <div>
+                  <h3 class="dl-package-name">AyushMuzic Setup (.msi)</h3>
+                  <p class="dl-package-sub">Bundled with high-performance native libmpv audio engine</p>
+                </div>
+              </div>
+
+              <div class="dl-meta-list">
+                <div class="dl-meta-row">
+                  <span class="meta-name">File Version</span>
+                  <span class="meta-val">v1.0.8 Windows x64</span>
+                </div>
+                <div class="dl-meta-row">
+                  <span class="meta-name">Package Size</span>
+                  <span class="meta-val">~178.8 MB (All Runtimes Included)</span>
+                </div>
+                <div class="dl-meta-row">
+                  <span class="meta-name">Compatibility</span>
+                  <span class="meta-val">Windows 10 / Windows 11 (64-bit)</span>
+                </div>
+                <div class="dl-meta-row">
+                  <span class="meta-name">Key Features</span>
+                  <span class="meta-val">System Tray, Media Keys, Hardware Acceleration</span>
+                </div>
+              </div>
+
+              <!-- Real Windows MSI Hash -->
+              <div class="checksum-box">
+                <span class="checksum-label">SHA-256 CHECKSUM</span>
+                <code class="checksum-text" id="hashWindows">ED43E0D665FCC31EF468FA2F82C8F1430DC9351615745B004F1A751F06BAAA2D</code>
+                <button class="copy-hash-btn" data-target="hashWindows" title="Copy Checksum">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                  <span>Copy</span>
+                </button>
+              </div>
+
+              <div class="dl-card-actions">
+                <a href="/downloads/AyushMuzic-v1.0.8-Setup.msi" download="AyushMuzic-v1.0.8-Setup.msi" class="btn btn-primary btn-block">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                  <span>Download Windows Installer (.msi)</span>
+                </a>
+                <a href="https://github.com/jaatayushh/ayushmuzic/releases/latest" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-block">
+                  <span>GitHub Release Page</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Windows Portable & Developer Run Info -->
+            <div class="download-card glass-panel">
+              <div class="dl-card-header">
+                <div class="dl-platform-icon icon-code">
+                  <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+                </div>
+                <div>
+                  <h3 class="dl-package-name">Developer / CLI Launch</h3>
+                  <p class="dl-package-sub">Run directly using Gradle or package UberJar</p>
+                </div>
+              </div>
+
+              <p class="code-box-desc">AyushMuzic is built on Compose Multiplatform. Launch directly via PowerShell:</p>
+              
+              <div class="code-snippet-box">
+                <pre><code><span class="code-comment"># Run Desktop application</span>
+.\gradlew.bat :desktopApp:run
+
+<span class="code-comment"># Build Standalone Windows MSI</span>
+.\gradlew.bat :desktopApp:packageMsi</code></pre>
+              </div>
+
+              <ul class="feature-bullet-list">
+                <li>Native libmpv decoding without video lag</li>
+                <li>Keyboard shortcuts for play/pause and skip</li>
+                <li>Full multi-column widescreen UI layout</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+
+
+        <!-- TAB 4: LINUX & MACOS -->
+        <div class="platform-tab-pane" id="pane-desktop-other">
+          <div class="download-cards-grid">
+            
+            <!-- Linux Card -->
+            <div class="download-card glass-panel">
+              <div class="dl-card-header">
+                <div class="dl-platform-icon icon-linux">
+                  <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                </div>
+                <div>
+                  <h3 class="dl-package-name">Linux (.tar.gz / AppImage)</h3>
+                  <p class="dl-package-sub">Ubuntu, Fedora, Arch, Debian, openSUSE</p>
+                </div>
+              </div>
+              <p class="card-text-summary">
+                AyushMuzic runs natively on Linux through Compose Multiplatform with PulseAudio and PipeWire support.
+              </p>
+              <div class="code-snippet-box">
+                <pre><code><span class="code-comment"># Build or package for Linux</span>
+./gradlew :desktopApp:packageReleaseUberJarForCurrentOS</code></pre>
+              </div>
+              <a href="https://github.com/jaatayushh/ayushmuzic/releases" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-block">
+                <span>View Linux Releases on GitHub</span>
+              </a>
+            </div>
+
+            <!-- macOS Card -->
+            <div class="download-card glass-panel">
+              <div class="dl-card-header">
+                <div class="dl-platform-icon icon-apple">
+                  <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.63-.78 1.07-1.86.95-2.95-1 .04-2.16.66-2.83 1.44-.59.67-1.11 1.77-.97 2.83 1.12.09 2.22-.54 2.85-1.32z"/></svg>
+                </div>
+                <div>
+                  <h3 class="dl-package-name">macOS (.dmg Universal)</h3>
+                  <p class="dl-package-sub">Apple Silicon (M1/M2/M3/M4) & Intel Macs</p>
+                </div>
+              </div>
+              <p class="card-text-summary">
+                Enjoy Apple Music ergonomics with AyushMuzic's ad-free experience, native media keys, and full Retina resolution.
+              </p>
+              <div class="dl-meta-list">
+                <div class="dl-meta-row">
+                  <span class="meta-name">OS Required</span>
+                  <span class="meta-val">macOS 12 Monterey or newer</span>
+                </div>
+                <div class="dl-meta-row">
+                  <span class="meta-name">Architecture</span>
+                  <span class="meta-val">ARM64 & x86_64 Universal</span>
+                </div>
+              </div>
+              <a href="https://github.com/jaatayushh/ayushmuzic/releases" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-block">
+                <span>View macOS Releases on GitHub</span>
+              </a>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- COMPARISON TABLE: AyushMuzic vs Competition                    -->
+    <!-- ============================================================== -->
+    <section class="comparison-section" id="comparison">
+      <div class="container">
+        
+        <div class="section-header text-center">
+          <span class="section-tag">Unbeatable Value</span>
+          <h2 class="section-title">How AyushMuzic <span class="gradient-text">Compares</span></h2>
+          <p class="section-desc">See why thousands of music enthusiasts are switching from mainstream subscription apps.</p>
+        </div>
+
+        <div class="table-responsive glass-panel">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th class="col-feature">Feature</th>
+                <th class="col-highlight">AyushMuzic 🎵</th>
+                <th>YouTube Music Free</th>
+                <th>Spotify Free</th>
+                <th>Spotify Premium</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Monthly Cost</td>
+                <td class="col-highlight font-bold text-emerald">100% Free Forever</td>
+                <td>Free with Ads</td>
+                <td>Free with Ads</td>
+                <td>$11.99 / month</td>
+              </tr>
+              <tr>
+                <td>Ad-Free Playback</td>
+                <td class="col-highlight"><span class="check-yes">✅ Always Ad-Free</span></td>
+                <td><span class="check-no">❌ Audio & Video Ads</span></td>
+                <td><span class="check-no">❌ Repeated Ads</span></td>
+                <td><span class="check-yes">✅ Yes</span></td>
+              </tr>
+              <tr>
+                <td>Background & Screen-Off Play</td>
+                <td class="col-highlight"><span class="check-yes">✅ Yes (Unlimited)</span></td>
+                <td><span class="check-no">❌ Screen must stay on</span></td>
+                <td><span class="check-yes">✅ Yes</span></td>
+                <td><span class="check-yes">✅ Yes</span></td>
+              </tr>
+              <tr>
+                <td>Word-by-Word Synced Lyrics</td>
+                <td class="col-highlight"><span class="check-yes">✅ Syllable Karaoke</span></td>
+                <td><span class="check-partial">⚠️ Basic line sync</span></td>
+                <td><span class="check-partial">⚠️ Line sync only</span></td>
+                <td><span class="check-partial">⚠️ Line sync only</span></td>
+              </tr>
+              <tr>
+                <td>Listening Receipt & Analytics</td>
+                <td class="col-highlight"><span class="check-yes">✅ Built-in Thermal Receipt</span></td>
+                <td><span class="check-no">❌ No receipt feature</span></td>
+                <td><span class="check-no">❌ Third-party web tool</span></td>
+                <td><span class="check-no">❌ Third-party web tool</span></td>
+              </tr>
+              <tr>
+                <td>SponsorBlock Integration</td>
+                <td class="col-highlight"><span class="check-yes">✅ Auto-Skip Promos</span></td>
+                <td><span class="check-no">❌ No</span></td>
+                <td><span class="check-no">❌ No</span></td>
+                <td><span class="check-no">❌ No</span></td>
+              </tr>
+              <tr>
+                <td>On-Device Recommendations</td>
+                <td class="col-highlight"><span class="check-yes">✅ Guest Mode (No Account)</span></td>
+                <td><span class="check-no">❌ Generic trending</span></td>
+                <td><span class="check-no">❌ Forced login</span></td>
+                <td><span class="check-no">❌ Forced login</span></td>
+              </tr>
+              <tr>
+                <td>10-Band EQ & AutoEq Profiles</td>
+                <td class="col-highlight"><span class="check-yes">✅ 4,000+ Headphone Models</span></td>
+                <td><span class="check-no">❌ Basic system EQ</span></td>
+                <td><span class="check-partial">⚠️ 6-band basic EQ</span></td>
+                <td><span class="check-partial">⚠️ 6-band basic EQ</span></td>
+              </tr>
+              <tr>
+                <td>Cross-Platform Support</td>
+                <td class="col-highlight"><span class="check-yes">✅ Android, Win, TV, Mac, Linux</span></td>
+                <td><span class="check-partial">⚠️ Web & Mobile only</span></td>
+                <td><span class="check-yes">✅ Desktop & Mobile</span></td>
+                <td><span class="check-yes">✅ Desktop & Mobile</span></td>
+              </tr>
+              <tr>
+                <td>Open Source & Privacy</td>
+                <td class="col-highlight"><span class="check-yes">✅ 100% GPL-3.0 (Zero Trackers)</span></td>
+                <td><span class="check-no">❌ Proprietary tracking</span></td>
+                <td><span class="check-no">❌ Heavy telemetry</span></td>
+                <td><span class="check-no">❌ Heavy telemetry</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+
+
+    <!-- ============================================================== -->
+    <!-- FAQ SECTION                                                    -->
+    <!-- ============================================================== -->
+    <section class="faq-section" id="faq">
+      <div class="container">
+        
+        <div class="section-header text-center">
+          <span class="section-tag">Frequently Asked Questions</span>
+          <h2 class="section-title">Got Questions? <span class="gradient-text">We've Got Answers</span></h2>
+          <p class="section-desc">Clear answers about AyushMuzic, installation, privacy, and feature sets.</p>
+        </div>
+
+        <div class="faq-accordion-container">
+          
+          <div class="faq-card glass-panel" data-faq>
+            <button class="faq-question-btn" aria-expanded="false">
+              <span>What is AyushMuzic and how is it free?</span>
+              <svg class="faq-icon" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+            <div class="faq-answer-panel">
+              <p>
+                AyushMuzic is a free, open-source streaming client architected with Compose Multiplatform. It streams audio streams from YouTube and YouTube Music without ads, without tracking, and without forcing you to log in with a Google account. It is 100% free under the GNU General Public License v3.0 (GPLv3).
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-card glass-panel" data-faq>
+            <button class="faq-question-btn" aria-expanded="false">
+              <span>Do I need to sign in with a Google or YouTube account?</span>
+              <svg class="faq-icon" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+            <div class="faq-answer-panel">
+              <p>
+                <strong>No!</strong> AyushMuzic works out of the box in guest mode. Its local playback engine builds personalized recommendation carousels, "Jump back in" shelves, and similar song radios entirely on your device without storing your data in the cloud. You can optionally log in if you wish to sync your existing YouTube Music playlists.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-card glass-panel" data-faq>
+            <button class="faq-question-btn" aria-expanded="false">
+              <span>How does the Listening Receipt work? Is my history shared?</span>
+              <svg class="faq-icon" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+            <div class="faq-answer-panel">
+              <p>
+                The Listening Receipt is computed completely offline on your device using your Room database playback stats. It generates a stylized thermal receipt with authentic paper typography, barcode seed, item count, and duration. Your listening history is never transmitted to any third-party analytics servers.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-card glass-panel" data-faq>
+            <button class="faq-question-btn" aria-expanded="false">
+              <span>How do I install AyushMuzic on Windows?</span>
+              <svg class="faq-icon" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+            <div class="faq-answer-panel">
+              <p>
+                Simply download the <code>AyushMuzic-v1.0.8-Setup.msi</code> installer from our Download section. Run the installer and follow the prompt. It automatically configures the desktop application, start menu shortcut, and the native <code>libmpv</code> hardware-accelerated audio engine.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-card glass-panel" data-faq>
+            <button class="faq-question-btn" aria-expanded="false">
+              <span>Which desktop platforms are supported?</span>
+              <svg class="faq-icon" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+            <div class="faq-answer-panel">
+              <p>
+                AyushMuzic provides native desktop packages for <strong>Windows 10/11</strong> (via <code>.msi</code> installer), as well as <strong>macOS</strong> (Universal DMG for Intel and Apple Silicon) and <strong>Linux</strong> (tarball and AppImage).
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-card glass-panel" data-faq>
+            <button class="faq-question-btn" aria-expanded="false">
+              <span>Does AyushMuzic support offline caching and downloads?</span>
+              <svg class="faq-icon" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+            <div class="faq-answer-panel">
+              <p>
+                Yes! Tracks can be cached to local storage for offline playback so you can listen seamlessly without requiring an internet connection. You can also import playlists from Spotify or sync them with YouTube Music.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-card glass-panel" data-faq>
+            <button class="faq-question-btn" aria-expanded="false">
+              <span>What is SponsorBlock and how does it work in AyushMuzic?</span>
+              <svg class="faq-icon" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+            <div class="faq-answer-panel">
+              <p>
+                SponsorBlock is an open-source crowdsourced database that catalogs sponsor segments, intros, outros, and non-music dialog in music videos. AyushMuzic queries this database automatically to seamlessly jump over sponsors so you hear only uninterrupted music.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- CTA / GITHUB COMMUNITY CALLOUT                                 -->
+    <!-- ============================================================== -->
+    <section class="community-banner">
+      <div class="container">
+        <div class="community-card glass-panel">
+          <div class="community-content">
+            <span class="community-tag">Open Source Community</span>
+            <h2 class="community-title">Ready to Experience <span class="gradient-text">AyushMuzic</span>?</h2>
+            <p class="community-desc">Join our growing community on GitHub. Star the repository, report issues, or contribute new features.</p>
+            <div class="community-buttons">
+              <a href="#download" class="btn btn-primary btn-lg">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                <span>Download AyushMuzic Free</span>
+              </a>
+              <a href="https://github.com/jaatayushh/ayushmuzic" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-lg">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                <span>Star on GitHub</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================== -->
+  <!-- FOOTER                                                         -->
+  <!-- ============================================================== -->
+  <footer class="site-footer">
+    <div class="container footer-container">
+      
+      <div class="footer-col-brand">
+        <a href="#home" class="brand-logo footer-logo">
+          <img src="website/assets/logo.png" alt="AyushMuzic" class="brand-icon" width="36" height="36">
+          <span class="brand-text">Ayush<span class="gradient-text">Muzic</span></span>
+        </a>
+        <p class="footer-tagline">
+          Next-generation ad-free music streaming client for Android, Windows, macOS & Linux.
+        </p>
+        <div class="footer-license-badge">
+          <span>Licensed under GNU GPL v3.0</span>
+        </div>
+      </div>
+
+      <div class="footer-col-nav">
+        <h4 class="footer-nav-title">Navigation</h4>
+        <ul class="footer-nav-list">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#explore">Explore Player</a></li>
+          <li><a href="#receipt-section">Listening Receipt</a></li>
+          <li><a href="#features">Key Features</a></li>
+          <li><a href="#download">Download Hub</a></li>
+          <li><a href="#comparison">Feature Matrix</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col-platforms">
+        <h4 class="footer-nav-title">Platforms</h4>
+        <ul class="footer-nav-list">
+          <li><a href="#download">Android (Universal & ARM64)</a></li>
+          <li><a href="#download">Windows 10/11 (.msi)</a></li>
+          <li><a href="#download">Linux (.tar.gz / AppImage)</a></li>
+          <li><a href="#download">macOS (.dmg Universal)</a></li>
+          <li><a href="#download">Android Auto (In-Vehicle)</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col-legal">
+        <h4 class="footer-nav-title">Open Source & Legal</h4>
+        <p class="footer-disclaimer">
+          <strong>Disclaimer:</strong> AyushMuzic is an independent, non-commercial open-source project. It is not affiliated, endorsed, or associated with Google LLC, YouTube, or Spotify. All trademarks, album artworks, and brand logos belong to their respective copyright holders.
+        </p>
+        <p class="footer-dmca">
+          AyushMuzic does not host any media files on its servers. Audio streams are resolved directly from public APIs.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Bottom Copyright Bar -->
+    <div class="footer-bottom-bar">
+      <div class="container footer-bottom-flex">
+        <div class="copyright-text">
+          &copy; 2026 AyushMuzic Project. Crafted with precision for music lovers worldwide.
+        </div>
+        <div class="footer-links-row">
+          <a href="https://github.com/jaatayushh/ayushmuzic" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <span class="dot-separator">•</span>
+          <a href="https://github.com/jaatayushh/ayushmuzic/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">License</a>
+          <span class="dot-separator">•</span>
+          <a href="https://github.com/jaatayushh/ayushmuzic/releases" target="_blank" rel="noopener noreferrer">Releases</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification element -->
+  <div class="toast-notification" id="toastNotification">
+    <span class="toast-icon">✓</span>
+    <span class="toast-message" id="toastMessage">Checksum copied to clipboard!</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="website/app.js"></script>
+</body>
+</html>
