@@ -15,7 +15,8 @@ import {
   shuffleArray,
   getStreamableAudioUrl,
   isSafariBrowser,
-  isSafariPlayable
+  isSafariPlayable,
+  getHighResCoverUrl
 } from './utils/audioUtils';
 import { Storage } from './utils/storage';
 import { seedLyricsAvailability } from './utils/lyricsUtils';

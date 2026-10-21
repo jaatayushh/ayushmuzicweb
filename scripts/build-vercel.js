@@ -17,9 +17,15 @@ console.log('Configuring /play route for Web Player...');
 if (!fs.existsSync(playDir)) {
   fs.mkdirSync(playDir, { recursive: true });
 }
-fs.copyFileSync(path.join(distDir, 'index.html'), path.join(playDir, 'index.html'));
+let playHtml = fs.readFileSync(path.join(distDir, 'index.html'), 'utf-8');
+// Convert relative asset paths to absolute paths so /play and /play/ both resolve perfectly
+playHtml = playHtml.replace(/src="\.\/assets\//g, 'src="/assets/');
+playHtml = playHtml.replace(/href="\.\/assets\//g, 'href="/assets/');
+playHtml = playHtml.replace(/href="\.\/manifest\.webmanifest"/g, 'href="/manifest.webmanifest"');
+playHtml = playHtml.replace(/href="\.\/logo\.png"/g, 'href="/logo.png"');
+fs.writeFileSync(path.join(playDir, 'index.html'), playHtml, 'utf-8');
 
-// Copy dist/assets to dist/play/assets so relative paths resolve cleanly
+// Copy dist/assets to dist/play/assets as well so both /assets and /play/assets resolve cleanly
 const distAssets = path.join(distDir, 'assets');
 const playAssets = path.join(playDir, 'assets');
 if (fs.existsSync(distAssets)) {
