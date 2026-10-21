@@ -43,26 +43,40 @@ export default async function handler(req: any, res: any) {
       const yt = await getYT();
       let info: any = null;
 
+      let iosErr = "";
+      let androidErr = "";
+      let webErr = "";
+
       // Primary client: IOS (returns direct audio URLs with valid signature)
       try {
         info = await yt.getBasicInfo(videoId, "IOS");
       } catch (err: any) {
-        console.warn("IOS getBasicInfo failed, trying ANDROID/WEB fallback:", err.message);
+        iosErr = err.message;
+        console.warn("IOS getBasicInfo failed:", err.message);
       }
 
       if (!info) {
         try {
           info = await yt.getBasicInfo(videoId, "ANDROID");
-        } catch {}
+        } catch (err: any) {
+          androidErr = err.message;
+        }
       }
       if (!info) {
         try {
           info = await yt.getBasicInfo(videoId, "WEB");
-        } catch {}
+        } catch (err: any) {
+          webErr = err.message;
+        }
       }
 
       if (!info) {
-        return res.status(502).json({ error: "Failed to fetch stream info for " + videoId });
+        return res.status(502).json({
+          error: "Failed to fetch stream info for " + videoId,
+          iosErr,
+          androidErr,
+          webErr,
+        });
       }
 
       const formats = info.streaming_data?.adaptive_formats || [];
@@ -81,7 +95,14 @@ export default async function handler(req: any, res: any) {
       }
 
       if (!directUrl) {
-        return res.status(404).json({ error: "No playable stream URL found" });
+        return res.status(404).json({
+          error: "No playable stream URL found",
+          iosErr,
+          androidErr,
+          webErr,
+          formatsCount: formats.length,
+          playabilityStatus: info.playability_status,
+        });
       }
 
       streamCache.set(videoId, { url: directUrl, timestamp: Date.now() });

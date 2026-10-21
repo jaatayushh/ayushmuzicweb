@@ -866,7 +866,7 @@ export const MainView: React.FC<MainViewProps> = ({
               ) : isSearchingOnline ? (
                 <div className="py-20 text-center text-zinc-400">
                   <Loader2 className="w-10 h-10 mx-auto mb-3 text-[#FF3366] animate-spin" />
-                  <p className="text-lg font-bold text-white">Searching YouTube Music for "{searchQuery}"...</p>
+                  <p className="text-lg font-bold text-white">Searching for "{searchQuery}"...</p>
                 </div>
               ) : (
                 <div className="py-20 text-center text-zinc-400">
