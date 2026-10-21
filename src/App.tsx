@@ -118,6 +118,10 @@ export default function App() {
   const [isCreatePlaylistOpen, setIsCreatePlaylistOpen] = useState(false);
   const [addToPlaylistTrack, setAddToPlaylistTrack] = useState<Track | null>(null);
 
+  // Silent 1-second audio carrier for native background playback and Lock-Screen MediaSession
+  const SILENT_AUDIO_WAV =
+    'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+
   // Audio Ref — rendered as a real DOM element below
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const ytPlayerRef = useRef<any>(null);
@@ -125,6 +129,16 @@ export default function App() {
   const isYtTrackActiveRef = useRef<boolean>(false);
   const pendingYtTrackRef = useRef<Track | null>(null);
   const [, setPreloadedTrackId] = useState<string | null>(null);
+
+  // Mutable refs to prevent stale closure bugs in third-party async listeners
+  const handleNextTrackRef = useRef<() => void>(() => {});
+  const handlePrevTrackRef = useRef<() => void>(() => {});
+  const handleTogglePlayPauseRef = useRef<() => void>(() => {});
+  const handleSeekRef = useRef<(time: number) => void>(() => {});
+  const currentTrackRef = useRef<Track | null>(null);
+  const repeatModeRef = useRef<RepeatMode>('off');
+  const isPlayingRef = useRef<boolean>(false);
+  const isTransitioningRef = useRef<boolean>(false);
 
   // Chunked-streaming buffered progress (drives the grey "downloaded" bar)
   const [bufferedPercent, setBufferedPercent] = useState(0);
@@ -176,10 +190,14 @@ export default function App() {
     (track: Track) => {
       if (isYouTubeTrack(track)) {
         isYtTrackActiveRef.current = true;
-        // Pause HTML5 audio
-        if (audioRef.current) {
-          audioRef.current.pause();
-          audioRef.current.currentTime = 0;
+        // Keep native audio element actively playing with silent carrier so mobile OS keeps background audio alive & shows lock screen media session
+        const audio = audioRef.current;
+        if (audio) {
+          if (audio.src !== SILENT_AUDIO_WAV) {
+            audio.src = SILENT_AUDIO_WAV;
+            audio.loop = true;
+          }
+          audio.play().catch(() => {});
         }
 
         const yt = ytPlayerRef.current;
@@ -211,6 +229,7 @@ export default function App() {
 
         const audio = audioRef.current;
         if (audio) {
+          audio.loop = false;
           const streamUrl = track.audioUrl || getStreamableAudioUrl(track);
           audio.src = streamUrl;
           audio.currentTime = 0;
@@ -358,8 +377,13 @@ export default function App() {
 
   // Audio Ended Listener (Continuous & Gapless Playback)
   const handleNextTrack = useCallback(async () => {
-    if (tracks.length === 0 && userQueue.length === 0 && relatedQueue.length === 0) return;
+    if (isTransitioningRef.current) return;
+    isTransitioningRef.current = true;
+    setTimeout(() => {
+      isTransitioningRef.current = false;
+    }, 1200);
 
+    const current = currentTrackRef.current;
     let nextTrack: Track | null = null;
 
     if (userQueue.length > 0) {
@@ -367,23 +391,27 @@ export default function App() {
       nextTrack = userQueue[0];
       setUserQueue((prev) => prev.slice(1));
     } else if (relatedQueue.length > 0) {
-      // 2. Play next song according to the current song's recommendations
-      nextTrack = relatedQueue[0];
-      setRelatedQueue((prev) => prev.slice(1));
+      // 2. Play next song according to the current song's recommendations (skip current or already played)
+      const candidate =
+        relatedQueue.find((t) => t.id !== current?.id && !playedTrackIds.includes(t.id)) ||
+        relatedQueue.find((t) => t.id !== current?.id) ||
+        relatedQueue[0];
+      nextTrack = candidate;
+      setRelatedQueue((prev) => prev.filter((t) => t.id !== candidate.id));
+      if (relatedQueue.length <= 5) {
+        loadMoreRelatedSongs();
+      }
     } else if (upNextQueue.length > 0) {
       // 3. Play exact top item from Up Next queue
       nextTrack = upNextQueue[0];
-    } else {
-      // 4. Queue pass completed — reset playedTrackIds and reshuffle if shuffle is on
-      setPlayedTrackIds([]);
-      if (isShuffle) {
-        const freshOrder: Track[] = shuffleArray(tracks);
-        setShuffledOrder(freshOrder);
-        const match: Track | undefined = freshOrder.find((t: Track) => t.id !== currentTrack?.id);
-        nextTrack = match ?? freshOrder[0] ?? null;
+    } else if (tracks.length > 0) {
+      // 4. Fallback to general tracks sequence
+      const baseSequence = isShuffle && shuffledOrder.length > 0 ? shuffledOrder : tracks;
+      const currentIdx = baseSequence.findIndex((t) => t.id === current?.id);
+      if (currentIdx !== -1 && currentIdx < baseSequence.length - 1) {
+        nextTrack = baseSequence[currentIdx + 1];
       } else {
-        const match: Track | undefined = tracks.find((t: Track) => t.id !== currentTrack?.id);
-        nextTrack = match ?? tracks[0] ?? null;
+        nextTrack = baseSequence[0];
       }
     }
 
@@ -403,13 +431,12 @@ export default function App() {
 
       // Keep recommendations fresh according to the newly playing track
       fetchRelatedSongs(nextTrack);
-      if (relatedQueue.length < 25) {
-        loadMoreRelatedSongs();
-      }
 
       playTrackAudio(nextTrack);
     }
-  }, [tracks, currentTrack, isShuffle, shuffledOrder, userQueue, relatedQueue, upNextQueue, markTrackAsPlayed, trackPlayStart, fetchRelatedSongs, loadMoreRelatedSongs, playTrackAudio]);
+  }, [tracks, isShuffle, shuffledOrder, userQueue, relatedQueue, upNextQueue, playedTrackIds, markTrackAsPlayed, trackPlayStart, fetchRelatedSongs, loadMoreRelatedSongs, playTrackAudio]);
+
+  handleNextTrackRef.current = handleNextTrack;
 
   // Preload next upcoming track into browser media cache as soon as current song is playing/loaded
   useEffect(() => {
@@ -461,10 +488,27 @@ export default function App() {
     if (!audio) return;
 
     const handleTimeUpdate = () => {
+      if (isYtTrackActiveRef.current) return;
       setCurrentTime(audio.currentTime);
+      if (
+        'mediaSession' in navigator &&
+        typeof navigator.mediaSession.setPositionState === 'function' &&
+        audio.duration &&
+        !isNaN(audio.duration) &&
+        audio.currentTime <= audio.duration
+      ) {
+        try {
+          navigator.mediaSession.setPositionState({
+            duration: audio.duration,
+            playbackRate: audio.playbackRate || 1.0,
+            position: audio.currentTime,
+          });
+        } catch {}
+      }
     };
 
     const handleLoadedMetadata = () => {
+      if (isYtTrackActiveRef.current) return;
       setDuration(audio.duration || 0);
     };
 
@@ -485,7 +529,7 @@ export default function App() {
       addToast('Error loading audio stream. Skipping to next track...', 'error');
       setIsPlaying(false);
       setTimeout(() => {
-        handleNextTrack();
+        handleNextTrackRef.current();
       }, 1500);
     };
 
@@ -500,7 +544,7 @@ export default function App() {
       audio.removeEventListener('progress', handleProgress);
       audio.removeEventListener('error', handleAudioError);
     };
-  }, [addToast, handleNextTrack]);
+  }, [addToast]);
 
   // Audio Ended Listener
   useEffect(() => {
@@ -509,7 +553,7 @@ export default function App() {
 
     const handleEnded = () => {
       if (isYtTrackActiveRef.current) return;
-      if (repeatMode === 'one' && currentTrack) {
+      if (repeatModeRef.current === 'one' && currentTrackRef.current) {
         audio.currentTime = 0;
         audio.play().catch((err) => {
           if (!err?.name?.includes('Abort') && !err?.message?.includes('interrupted')) {
@@ -517,7 +561,7 @@ export default function App() {
           }
         });
       } else {
-        handleNextTrack();
+        handleNextTrackRef.current();
       }
     };
 
@@ -525,7 +569,7 @@ export default function App() {
     return () => {
       audio.removeEventListener('ended', handleEnded);
     };
-  }, [currentTrack, repeatMode, isShuffle, tracks, handleNextTrack]);
+  }, []);
 
   // Sync Volume & Mute with Both Native Audio and YouTube Background Player
   useEffect(() => {
@@ -553,8 +597,8 @@ export default function App() {
 
       try {
         ytPlayerRef.current = new window.YT.Player('youtube-player-mount', {
-          height: '1',
-          width: '1',
+          height: '200',
+          width: '200',
           playerVars: {
             autoplay: 1,
             controls: 0,
@@ -584,18 +628,18 @@ export default function App() {
               } else if (event.data === window.YT.PlayerState.PAUSED) {
                 setIsPlaying(false);
               } else if (event.data === window.YT.PlayerState.ENDED) {
-                if (repeatMode === 'one' && currentTrack) {
+                if (repeatModeRef.current === 'one' && currentTrackRef.current) {
                   event.target.seekTo(0, true);
                   event.target.playVideo();
                 } else {
-                  handleNextTrack();
+                  handleNextTrackRef.current();
                 }
               }
             },
             onError: (err: any) => {
               console.warn('YouTube Player error code:', err?.data);
               setTimeout(() => {
-                handleNextTrack();
+                handleNextTrackRef.current();
               }, 1200);
             },
           },
@@ -611,20 +655,42 @@ export default function App() {
       window.onYouTubeIframeAPIReady = setupPlayer;
     }
 
-    // High frequency ticker to synchronize current time and duration
+    // High frequency ticker to synchronize current time, duration and mediaSession position
     ticker = setInterval(() => {
       if (isYtTrackActiveRef.current && ytPlayerRef.current && typeof ytPlayerRef.current.getCurrentTime === 'function') {
         try {
           const t = ytPlayerRef.current.getCurrentTime();
+          const d = ytPlayerRef.current.getDuration();
           if (typeof t === 'number' && !isNaN(t) && t >= 0) {
             setCurrentTime(t);
-            if (audioRef.current) {
-              audioRef.current.currentTime = t;
-            }
           }
-          const d = ytPlayerRef.current.getDuration();
           if (typeof d === 'number' && !isNaN(d) && d > 0) {
             setDuration(d);
+            // End-of-track watchdog for mobile:
+            // Mobile YouTube iframes often hang/stall in the last 0.6 seconds without firing ENDED
+            if (t > 0 && d - t <= 0.6 && !isTransitioningRef.current) {
+              if (repeatModeRef.current === 'one' && currentTrackRef.current) {
+                ytPlayerRef.current.seekTo(0, true);
+              } else {
+                handleNextTrackRef.current();
+              }
+            }
+          }
+          // Sync MediaSession position state for lock screen scrubber
+          if (
+            'mediaSession' in navigator &&
+            typeof navigator.mediaSession.setPositionState === 'function' &&
+            d > 0 &&
+            t >= 0 &&
+            t <= d
+          ) {
+            try {
+              navigator.mediaSession.setPositionState({
+                duration: d,
+                playbackRate: 1.0,
+                position: t,
+              });
+            } catch {}
           }
         } catch {}
       }
@@ -633,7 +699,7 @@ export default function App() {
     return () => {
       if (ticker) clearInterval(ticker);
     };
-  }, [handleNextTrack, volume, isMuted, repeatMode, currentTrack]);
+  }, [volume, isMuted]);
 
   // Save Last Played Track position periodically
   useEffect(() => {
@@ -905,22 +971,39 @@ export default function App() {
 
     if (isYtTrackActiveRef.current) {
       const yt = ytPlayerRef.current;
+      const audio = audioRef.current;
       if (yt && typeof yt.getPlayerState === 'function') {
         try {
           const state = yt.getPlayerState();
           if (state === 1) {
             yt.pauseVideo();
+            if (audio) audio.pause();
             setIsPlaying(false);
           } else {
             yt.playVideo();
+            if (audio) {
+              if (audio.src !== SILENT_AUDIO_WAV) {
+                audio.src = SILENT_AUDIO_WAV;
+                audio.loop = true;
+              }
+              audio.play().catch(() => {});
+            }
             setIsPlaying(true);
           }
         } catch {
           if (isPlaying) {
             yt.pauseVideo();
+            if (audio) audio.pause();
             setIsPlaying(false);
           } else {
             yt.playVideo();
+            if (audio) {
+              if (audio.src !== SILENT_AUDIO_WAV) {
+                audio.src = SILENT_AUDIO_WAV;
+                audio.loop = true;
+              }
+              audio.play().catch(() => {});
+            }
             setIsPlaying(true);
           }
         }
@@ -948,7 +1031,9 @@ export default function App() {
           });
       }
     }
-  }, [currentTrack, isPlaying, tracks, isBenignPlayError, addToast]);
+  }, [currentTrack, isPlaying, tracks, isBenignPlayError, addToast, handlePlayTrack]);
+
+  handleTogglePlayPauseRef.current = handleTogglePlayPause;
 
   // Previous Track Logic
   const handlePrevTrack = useCallback(() => {
@@ -983,6 +1068,8 @@ export default function App() {
     handlePlayTrack(tracks[prevIndex]);
   }, [tracks, currentTrack, playedTrackIds, handlePlayTrack, currentTime, playTrackAudio]);
 
+  handlePrevTrackRef.current = handlePrevTrack;
+
   // Seek Progress
   const handleSeek = useCallback((time: number) => {
     if (isYtTrackActiveRef.current) {
@@ -998,7 +1085,21 @@ export default function App() {
       }
     }
     setCurrentTime(time);
-  }, []);
+    if ('mediaSession' in navigator && typeof navigator.mediaSession.setPositionState === 'function' && duration > 0) {
+      try {
+        navigator.mediaSession.setPositionState({
+          duration,
+          playbackRate: 1.0,
+          position: time,
+        });
+      } catch {}
+    }
+  }, [duration]);
+
+  handleSeekRef.current = handleSeek;
+  currentTrackRef.current = currentTrack;
+  repeatModeRef.current = repeatMode;
+  isPlayingRef.current = isPlaying;
 
   // Volume Change
   const handleVolumeChange = useCallback((newVol: number) => {
@@ -1175,27 +1276,36 @@ export default function App() {
     };
   }, [handleTogglePlayPause, handleSeek, handleToggleMute, duration]);
 
-  // Media Session API — this is what makes background/lock-screen playback
-  // actually work correctly. Without it, browsers have no signal that this
-  // tab is running an active media session, so backgrounded/locked-screen
-  // tabs can get frozen by the browser's power-saving throttling — the
-  // *current* song keeps playing (native OS audio session), but the JS
-  // callback that would advance to the next track when it ends never gets
-  // to run. Registering metadata + action handlers here also gives proper
-  // lock-screen/notification playback controls (title, artist, artwork,
-  // play/pause/next/previous) for free.
+  // Helper to ensure absolute URL for media session artwork (required by mobile OS notifications)
+  const toAbsoluteUrl = (url?: string | null) => {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+      return url;
+    }
+    try {
+      return new URL(url, window.location.origin).href;
+    } catch {
+      return url;
+    }
+  };
+
+  // Media Session API — provides lock-screen / notification controls, title, artist, and cover art
   useEffect(() => {
     if (!('mediaSession' in navigator) || !currentTrack) return;
 
+    const highResCover = getHighResCoverUrl(currentTrack.coverArtUrl, currentTrack.path);
+    const resolvedArtwork = toAbsoluteUrl(highResCover || currentTrack.coverArtUrl || '/pwa-512x512.png');
+
     navigator.mediaSession.metadata = new MediaMetadata({
-      title: currentTrack.title,
-      artist: currentTrack.artist || 'Unknown Artist',
-      album: currentTrack.album || '',
-      artwork: currentTrack.coverArtUrl
+      title: currentTrack.title || 'Unknown Title',
+      artist: currentTrack.artist || 'AyushMuzic',
+      album: currentTrack.album || 'AyushMuzic',
+      artwork: resolvedArtwork
         ? [
-            { src: currentTrack.coverArtUrl, sizes: '512x512', type: 'image/jpeg' },
-            { src: currentTrack.coverArtUrl, sizes: '256x256', type: 'image/jpeg' },
-            { src: currentTrack.coverArtUrl, sizes: '96x96', type: 'image/jpeg' },
+            { src: resolvedArtwork, sizes: '512x512', type: 'image/jpeg' },
+            { src: resolvedArtwork, sizes: '256x256', type: 'image/jpeg' },
+            { src: resolvedArtwork, sizes: '192x192', type: 'image/jpeg' },
+            { src: resolvedArtwork, sizes: '96x96', type: 'image/jpeg' },
           ]
         : [],
     });
@@ -1209,13 +1319,14 @@ export default function App() {
   useEffect(() => {
     if (!('mediaSession' in navigator)) return;
 
-    navigator.mediaSession.setActionHandler('play', () => handleTogglePlayPause());
-    navigator.mediaSession.setActionHandler('pause', () => handleTogglePlayPause());
-    navigator.mediaSession.setActionHandler('previoustrack', () => handlePrevTrack());
-    navigator.mediaSession.setActionHandler('nexttrack', () => handleNextTrack());
+    // Use ref-based handlers so we never recreate listeners on every state change and avoid stale closures
+    navigator.mediaSession.setActionHandler('play', () => handleTogglePlayPauseRef.current());
+    navigator.mediaSession.setActionHandler('pause', () => handleTogglePlayPauseRef.current());
+    navigator.mediaSession.setActionHandler('previoustrack', () => handlePrevTrackRef.current());
+    navigator.mediaSession.setActionHandler('nexttrack', () => handleNextTrackRef.current());
     try {
       navigator.mediaSession.setActionHandler('seekto', (details) => {
-        if (details.seekTime != null) handleSeek(details.seekTime);
+        if (details.seekTime != null) handleSeekRef.current(details.seekTime);
       });
     } catch {
       // seekto isn't supported in every browser — safe to ignore
@@ -1228,11 +1339,9 @@ export default function App() {
       navigator.mediaSession.setActionHandler('nexttrack', null);
       try {
         navigator.mediaSession.setActionHandler('seekto', null);
-      } catch {
-        // ignore
-      }
+      } catch {}
     };
-  }, [handleTogglePlayPause, handlePrevTrack, handleNextTrack, handleSeek]);
+  }, []);
 
   // --- View Transitions Helper ---
   const navigateTab = useCallback((tab: ActiveTab) => {
@@ -1257,19 +1366,27 @@ export default function App() {
         ref={audioRef}
         playsInline
         preload="auto"
-        style={{ display: 'none' }}
+        style={{
+          position: 'fixed',
+          top: '-9999px',
+          left: '-9999px',
+          width: '1px',
+          height: '1px',
+          opacity: 0.001,
+          pointerEvents: 'none',
+        }}
       />
       <div
         id="youtube-player-mount"
         style={{
           position: 'fixed',
-          bottom: 0,
-          right: 0,
-          width: '1px',
-          height: '1px',
-          opacity: 0.01,
+          top: '-9999px',
+          left: '-9999px',
+          width: '200px',
+          height: '200px',
+          opacity: 1,
           pointerEvents: 'none',
-          zIndex: -1,
+          zIndex: -999,
         }}
       />
       <Toast toasts={toasts} onDismiss={dismissToast} />
