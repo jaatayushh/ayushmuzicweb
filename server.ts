@@ -369,11 +369,27 @@ async function startServer() {
       if (cached && (Date.now() - cached.timestamp < 14400000)) {
         directUrl = cached.url;
       } else {
-        const cmd = `yt-dlp --no-warnings -g -f "ba/b" "https://www.youtube.com/watch?v=${videoId}"`;
-        const { stdout } = await execAsync(cmd, { timeout: 25000 });
-        const urls = stdout.split(/\r?\n/).map((l) => l.trim()).filter((l) => l.startsWith("http"));
-        if (!urls.length) throw new Error("No stream URL extracted by yt-dlp");
-        directUrl = urls[0];
+        try {
+          const yt = await getYT();
+          const info = await yt.getBasicInfo(videoId, "IOS");
+          const formats = info.streaming_data?.adaptive_formats || [];
+          const audioFormats = formats
+            .filter((f: any) => f.mime_type?.startsWith("audio/") && f.url)
+            .sort((a: any, b: any) => (b.bitrate || 0) - (a.bitrate || 0));
+          if (audioFormats.length > 0) {
+            directUrl = audioFormats[0].url;
+          }
+        } catch (e: any) {
+          console.warn("Pure JS getBasicInfo failed in server.ts, falling back to yt-dlp:", e.message);
+        }
+
+        if (!directUrl) {
+          const cmd = `yt-dlp --no-warnings -g -f "ba/b" "https://www.youtube.com/watch?v=${videoId}"`;
+          const { stdout } = await execAsync(cmd, { timeout: 25000 });
+          const urls = stdout.split(/\r?\n/).map((l) => l.trim()).filter((l) => l.startsWith("http"));
+          if (!urls.length) throw new Error("No stream URL extracted by yt-dlp");
+          directUrl = urls[0];
+        }
         streamCache.set(videoId, { url: directUrl, timestamp: Date.now() });
       }
 
