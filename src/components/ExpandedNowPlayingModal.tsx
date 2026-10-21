@@ -192,7 +192,7 @@ export const ExpandedNowPlayingModal: React.FC<ExpandedNowPlayingModalProps> = (
       </div>
 
       {/* TOP HEADER BAR */}
-      <div className="relative z-10 flex items-center justify-between px-4 sm:px-8 py-3 bg-transparent shrink-0">
+      <div className="relative z-10 flex items-center justify-between px-4 sm:px-8 pt-[max(0.75rem,env(safe-area-inset-top,0px))] pb-2 bg-transparent shrink-0">
         <button
           onClick={onClose}
           className="p-2 text-zinc-400 hover:text-white rounded-full transition-all active:scale-90"
@@ -466,7 +466,7 @@ export const ExpandedNowPlayingModal: React.FC<ExpandedNowPlayingModalProps> = (
         </div>
 
         {/* BOTTOM CONTROLS PANEL */}
-        <div className="relative z-10 px-5 sm:px-12 pb-6 sm:pb-8 pt-1 bg-transparent max-w-3xl mx-auto w-full space-y-4 shrink-0">
+        <div className="relative z-10 px-5 sm:px-12 pb-[max(1.75rem,env(safe-area-inset-bottom,0px))] pt-1 bg-transparent max-w-3xl mx-auto w-full space-y-4 shrink-0">
           
           {/* Song Info & Buttons */}
           {activeTab === 'art' && (

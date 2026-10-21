@@ -44,9 +44,9 @@ export const QueueModal: React.FC<QueueModalProps> = ({
         className="bg-zinc-950 border-l border-zinc-800 w-full max-w-md h-full flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-right duration-300"
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-6 pb-4 border-b border-zinc-800 shrink-0">
+        <div className="flex items-center justify-between px-6 pt-[max(1.25rem,env(safe-area-inset-top,0px))] pb-4 border-b border-zinc-800 shrink-0">
           <div className="flex items-center gap-2 text-white font-bold text-lg">
-            <ListMusic className="w-5 h-5 text-[#FF3366]" />
+            <ListMusic className="w-5 h-5 text-[#ec4899]" />
             <span>Play Queue</span>
           </div>
           <button
@@ -65,7 +65,7 @@ export const QueueModal: React.FC<QueueModalProps> = ({
               onLoadMoreQueue?.();
             }
           }}
-          className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar"
+          className="flex-1 overflow-y-auto px-6 pt-6 pb-[max(2rem,env(safe-area-inset-bottom,0px))] space-y-8 custom-scrollbar"
         >
           
           {/* Autoplay Toggle */}

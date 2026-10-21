@@ -115,7 +115,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({
         </div>
 
         {/* Modal Body */}
-        <div className="p-5 sm:p-6 overflow-y-auto space-y-4">
+        <div className="p-5 sm:p-6 pb-[max(1.5rem,env(safe-area-inset-bottom,0px))] overflow-y-auto space-y-4">
           {alreadyStandalone || installed ? (
             <div className="flex flex-col items-center text-center gap-3 py-6 bg-zinc-900/60 rounded-2xl border border-zinc-800 p-6">
               <CheckCircle2 className="w-12 h-12 text-[#ec4899]" />

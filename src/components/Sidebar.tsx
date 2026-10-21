@@ -183,11 +183,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Mobile Bottom Navigation */}
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 flex items-center justify-around py-2.5 px-3 z-40"
+        aria-label="Mobile Navigation"
+        className="md:hidden fixed bottom-0 left-0 right-0 flex items-center justify-around px-2 pt-2 z-50 select-none"
         style={{
-          background: 'rgba(10,10,15,0.96)',
-          backdropFilter: 'blur(20px)',
-          borderTop: '1px solid rgba(255,255,255,0.06)',
+          background: 'rgba(12,12,16,0.95)',
+          backdropFilter: 'blur(24px)',
+          borderTop: '1px solid rgba(255,255,255,0.08)',
+          paddingBottom: 'max(0.6rem, env(safe-area-inset-bottom, 0px))',
         }}
       >
         {([
@@ -196,19 +198,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
           { key: 'allSongs' as ActiveTab, label: 'All Songs', Icon: ListMusic },
           { key: 'liked' as ActiveTab, label: 'Liked', Icon: Heart },
           { key: 'library' as ActiveTab, label: 'Library', Icon: Library },
-        ]).map(({ key, label, Icon }) => (
-          <button
-            key={key}
-            onClick={() => { setActiveTab(key); setActivePlaylistId(null); }}
-            className="flex flex-col items-center gap-1 text-[10px] font-semibold min-w-[48px] min-h-[44px] justify-center transition-colors"
-            style={{
-              color: activeTab === key ? '#ec4899' : '#71717a',
-            }}
-          >
-            <Icon className="w-5 h-5" />
-            <span>{label}</span>
-          </button>
-        ))}
+        ]).map(({ key, label, Icon }) => {
+          const isActive = activeTab === key && !activePlaylistId;
+          return (
+            <button
+              key={key}
+              onClick={() => { setActiveTab(key); setActivePlaylistId(null); }}
+              className="flex flex-col items-center gap-1 text-[10px] font-bold min-w-[52px] min-h-[44px] justify-center transition-all active:scale-95 cursor-pointer relative"
+              style={{
+                color: isActive ? '#ec4899' : '#a1a1aa',
+              }}
+            >
+              <Icon className={`w-5 h-5 transition-transform ${isActive ? 'scale-110' : ''}`} />
+              <span className="tracking-tight">{label}</span>
+              {isActive && (
+                <span className="absolute -top-1 w-6 h-0.5 rounded-full bg-gradient-to-r from-[#8b5cf6] to-[#ec4899]" />
+              )}
+            </button>
+          );
+        })}
       </nav>
     </>
   );

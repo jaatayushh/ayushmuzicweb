@@ -137,9 +137,9 @@ export const PlayerBar: React.FC<PlayerBarProps> = React.memo(({
 
   if (!currentTrack) {
     return (
-      <div className="fixed bottom-14 md:bottom-0 left-0 right-0 h-16 md:h-20 bg-[#0c0c0e] border-t border-zinc-800/80 px-4 md:px-6 flex items-center justify-between text-zinc-500 text-xs md:text-sm select-none z-40 pb-safe">
+      <div className="hidden md:flex fixed bottom-0 left-0 right-0 h-20 bg-[#0c0c0e] border-t border-zinc-800/80 px-6 items-center justify-between text-zinc-500 text-sm select-none z-40">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 md:w-12 md:h-12 rounded bg-zinc-800 flex items-center justify-center">
+          <div className="w-12 h-12 rounded bg-zinc-800 flex items-center justify-center">
             <Music className="w-5 h-5 text-zinc-600" />
           </div>
           <span>Select a track to start playing</span>
@@ -151,16 +151,16 @@ export const PlayerBar: React.FC<PlayerBarProps> = React.memo(({
   const fallbackSvg = generateCoverArt(currentTrack.title, currentTrack.artist, currentTrack.gradientColors);
 
   return (
-    <footer className="fixed bottom-[60px] md:bottom-0 left-0 right-0 h-16 md:h-24 bg-[#131316]/95 md:bg-[#0c0c0e]/95 backdrop-blur-xl border-t border-zinc-800/80 px-3 md:px-6 flex items-center justify-between gap-2 md:gap-4 select-none z-40 text-white shadow-2xl">
+    <footer className="fixed bottom-[calc(56px+max(0.6rem,env(safe-area-inset-bottom,0px)))] md:bottom-0 left-0 right-0 h-16 md:h-24 bg-[#131316]/95 md:bg-[#0c0c0e]/95 backdrop-blur-2xl border-t border-zinc-800/80 px-3 md:px-6 flex items-center justify-between gap-2 md:gap-4 select-none z-40 text-white shadow-2xl">
       {/* Top thin progress bar for mobile view */}
-      <div className="md:hidden absolute top-0 left-0 right-0 h-1 bg-zinc-800">
+      <div className="md:hidden absolute top-0 left-0 right-0 h-1 bg-zinc-800/80">
         {/* Grey chunk-download indicator */}
         <div
           className="absolute inset-y-0 left-0 bg-zinc-500/60 transition-all duration-300"
           style={{ width: `${bufferedPercent}%` }}
         />
         <div
-          className="h-full bg-[#FF3366] transition-all duration-150 relative"
+          className="h-full bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] transition-all duration-150 relative"
           style={{ width: `${progressPercent}%` }}
         />
       </div>

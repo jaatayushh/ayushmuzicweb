@@ -31,13 +31,13 @@ export const AddToPlaylistModal: React.FC<AddToPlaylistModalProps> = ({
   );
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
       <div
-        className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 w-full max-w-md shadow-2xl relative flex flex-col max-h-[85vh]"
+        className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 sm:p-6 w-full max-w-md shadow-2xl relative flex flex-col max-h-[88vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-zinc-800 shrink-0">
+        <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-zinc-800 shrink-0">
           <div>
             <h3 className="text-lg font-black text-white tracking-tight">Add to Playlist</h3>
             <p className="text-xs text-zinc-400">Save song to your custom collections</p>
@@ -45,14 +45,14 @@ export const AddToPlaylistModal: React.FC<AddToPlaylistModalProps> = ({
 
           <button
             onClick={onClose}
-            className="text-zinc-400 hover:text-white p-2 hover:bg-zinc-800 rounded-full transition-colors"
+            className="text-zinc-400 hover:text-white p-2 hover:bg-zinc-800 rounded-full transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Selected Track Preview Header */}
-        <div className="flex items-center gap-3 my-4 p-3 rounded-xl bg-zinc-800/60 border border-zinc-800 shrink-0">
+        <div className="flex items-center gap-3 my-3 p-3 rounded-xl bg-zinc-800/60 border border-zinc-800 shrink-0">
           <img
             src={track.coverArtUrl || fallbackSvg}
             alt={track.title}
@@ -73,9 +73,9 @@ export const AddToPlaylistModal: React.FC<AddToPlaylistModalProps> = ({
             onClose();
             onCreateNewPlaylist();
           }}
-          className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-zinc-800/90 hover:bg-zinc-800 border border-zinc-700/80 text-[#FF3366] hover:text-[#FF4D79] font-bold text-xs transition-all mb-3 shrink-0 active:scale-98"
+          className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-gradient-to-r from-[#8b5cf6]/20 to-[#ec4899]/20 hover:from-[#8b5cf6]/30 hover:to-[#ec4899]/30 border border-[#ec4899]/30 text-white font-bold text-xs transition-all mb-3 shrink-0 active:scale-98 cursor-pointer shadow-sm"
         >
-          <FolderPlus className="w-4 h-4" />
+          <FolderPlus className="w-4 h-4 text-[#ec4899]" />
           <span>Create New Playlist</span>
         </button>
 
@@ -88,7 +88,7 @@ export const AddToPlaylistModal: React.FC<AddToPlaylistModalProps> = ({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search playlists..."
-              className="w-full bg-zinc-800/80 border border-zinc-700/60 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#FF3366]"
+              className="w-full bg-zinc-800/80 border border-zinc-700/60 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#ec4899]"
             />
           </div>
         )}
@@ -113,9 +113,9 @@ export const AddToPlaylistModal: React.FC<AddToPlaylistModalProps> = ({
                 <button
                   key={pl.id}
                   onClick={() => onToggleTrackInPlaylist(track.id, pl.id)}
-                  className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all text-left ${
+                  className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all text-left cursor-pointer ${
                     inPlaylist
-                      ? 'bg-[#FF3366]/10 border-[#FF3366]/50 text-white'
+                      ? 'bg-[#ec4899]/15 border-[#ec4899]/50 text-white'
                       : 'bg-zinc-800/40 border-zinc-800 hover:bg-zinc-800/80 text-zinc-300'
                   }`}
                 >
@@ -123,7 +123,7 @@ export const AddToPlaylistModal: React.FC<AddToPlaylistModalProps> = ({
                     <div
                       className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 font-bold ${
                         inPlaylist
-                          ? 'bg-[#FF3366] text-black'
+                          ? 'bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] text-white'
                           : 'bg-zinc-700 text-zinc-300'
                       }`}
                     >
@@ -140,7 +140,7 @@ export const AddToPlaylistModal: React.FC<AddToPlaylistModalProps> = ({
                   <div
                     className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${
                       inPlaylist
-                        ? 'bg-[#FF3366] text-black'
+                        ? 'bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] text-white shadow-sm'
                         : 'border border-zinc-600 text-transparent hover:border-zinc-400'
                     }`}
                   >
@@ -153,10 +153,10 @@ export const AddToPlaylistModal: React.FC<AddToPlaylistModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="pt-4 mt-2 border-t border-zinc-800 flex justify-end shrink-0">
+        <div className="pt-3 mt-2 border-t border-zinc-800 flex justify-end shrink-0">
           <button
             onClick={onClose}
-            className="px-6 py-2 rounded-full text-xs font-bold bg-zinc-800 hover:bg-zinc-700 text-white transition-colors"
+            className="px-6 py-2 rounded-full text-xs font-bold bg-zinc-800 hover:bg-zinc-700 text-white transition-colors cursor-pointer"
           >
             Done
           </button>

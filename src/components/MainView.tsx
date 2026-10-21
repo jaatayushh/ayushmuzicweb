@@ -266,7 +266,7 @@ export const MainView: React.FC<MainViewProps> = ({
   ], []);
 
   return (
-    <main className="flex-1 overflow-y-auto pb-36 md:pb-28 px-4 sm:px-6 pt-4 custom-scrollbar select-none bg-black">
+    <main className="flex-1 overflow-y-auto pb-[calc(140px+max(0.6rem,env(safe-area-inset-bottom,0px)))] md:pb-28 px-3.5 sm:px-6 pt-3 sm:pt-4 custom-scrollbar select-none bg-black">
       {activeTab === 'home' && !activePlaylistId && !viewingAiPlaylistId && (
         <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300">
 
@@ -498,17 +498,17 @@ export const MainView: React.FC<MainViewProps> = ({
                 <span className="text-xs text-zinc-500 font-medium">Refreshes daily</span>
               </div>
 
-              <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 custom-scrollbar snap-x">
+              <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 custom-scrollbar snap-x -mx-3.5 px-3.5 sm:mx-0 sm:px-0">
                 {aiPlaylists.map((pl) => {
                   const [c1, c2] = getGradientColors(pl.name);
                   return (
                     <div
                       key={pl.id}
                       onClick={() => setViewingAiPlaylistId(pl.id)}
-                      className="shrink-0 w-40 sm:w-48 snap-start p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 cursor-pointer group hover:bg-zinc-800/60 transition-all"
+                      className="shrink-0 w-36 sm:w-44 md:w-48 snap-start p-3 sm:p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 cursor-pointer group hover:bg-zinc-800/60 transition-all active:scale-[0.98]"
                     >
                       <div
-                        className="w-full aspect-square rounded-xl flex items-center justify-center text-4xl relative overflow-hidden shadow-lg mb-3"
+                        className="w-full aspect-square rounded-xl flex items-center justify-center text-3xl sm:text-4xl relative overflow-hidden shadow-lg mb-2.5 sm:mb-3"
                         style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }}
                       >
                         <span>{pl.emoji}</span>
@@ -517,14 +517,14 @@ export const MainView: React.FC<MainViewProps> = ({
                             e.stopPropagation();
                             if (pl.tracks.length > 0) onPlayTrack(pl.tracks[0], pl.tracks);
                           }}
-                          className="absolute bottom-2 right-2 w-10 h-10 rounded-full bg-[#FF3366] text-black flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all shadow-2xl"
+                          className="absolute bottom-2 right-2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:scale-105 active:scale-95 transition-all shadow-xl"
                           title={`Play ${pl.name}`}
                         >
-                          <Play className="w-5 h-5 fill-black translate-x-0.5" />
+                          <Play className="w-4 h-4 fill-white translate-x-0.5" />
                         </button>
                       </div>
-                      <h3 className="text-sm font-bold text-white truncate">{pl.name}</h3>
-                      <p className="text-xs text-zinc-400 mt-0.5 line-clamp-2">
+                      <h3 className="text-xs sm:text-sm font-bold text-white truncate">{pl.name}</h3>
+                      <p className="text-[11px] sm:text-xs text-zinc-400 mt-0.5 line-clamp-2">
                         {pl.description || `${pl.tracks.length} AI-picked tracks`}
                       </p>
                     </div>
@@ -772,34 +772,37 @@ export const MainView: React.FC<MainViewProps> = ({
       {/* ----------------- SEARCH TAB ----------------- */}
       {activeTab === 'search' && (
         <div className="space-y-6 animate-in fade-in duration-300">
-          <div className="relative">
-            <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <div className="relative max-w-3xl">
+            <Search className="w-5 h-5 text-zinc-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
               placeholder="What do you want to listen to?"
               autoFocus
-              className="w-full rounded-full pl-10 pr-9 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none transition-all"
+              className="w-full rounded-full pl-11 pr-12 py-3 text-sm sm:text-base text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
               style={{
                 background: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,255,255,0.10)',
+                border: '1px solid rgba(255,255,255,0.12)',
               }}
               onFocusCapture={(e) => {
-                e.currentTarget.style.border = '1px solid #FF3366';
-                e.currentTarget.style.background = 'rgba(255,255,255,0.10)';
+                e.currentTarget.style.border = '1px solid #ec4899';
+                e.currentTarget.style.background = 'rgba(255,255,255,0.12)';
+                e.currentTarget.style.boxShadow = '0 0 15px rgba(236,72,153,0.2)';
               }}
               onBlurCapture={(e) => {
-                e.currentTarget.style.border = '1px solid rgba(255,255,255,0.10)';
+                e.currentTarget.style.border = '1px solid rgba(255,255,255,0.12)';
                 e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
+                e.currentTarget.style.boxShadow = 'none';
               }}
             />
             {localSearch && (
               <button
                 onClick={() => setLocalSearch('')}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white p-0.5 rounded-full transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-white rounded-full hover:bg-white/10 active:scale-90 transition-all cursor-pointer"
+                title="Clear Search"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-4 h-4" />
               </button>
             )}
           </div>
@@ -879,18 +882,18 @@ export const MainView: React.FC<MainViewProps> = ({
           ) : (
             <div className="space-y-6">
               <h2 className="text-2xl font-extrabold text-white tracking-tight">Browse all</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-4">
                 {SEARCH_CATEGORIES.map((cat) => (
                   <div
                     key={cat.name}
                     onClick={() => setLocalSearch(cat.query)}
-                    className={`${cat.color} aspect-video sm:aspect-square p-4 rounded-xl cursor-pointer hover:scale-[1.03] active:scale-[0.98] transition-all shadow-lg flex flex-col justify-between overflow-hidden relative group`}
+                    className={`${cat.color} min-h-[84px] sm:min-h-[110px] sm:aspect-square p-3 sm:p-4 rounded-xl cursor-pointer hover:scale-[1.03] active:scale-[0.98] transition-all shadow-lg flex flex-col justify-between overflow-hidden relative group`}
                   >
-                    <span className="font-extrabold text-white text-base sm:text-lg tracking-tight leading-tight z-10 drop-shadow">
+                    <span className="font-extrabold text-white text-sm sm:text-base md:text-lg tracking-tight leading-snug z-10 drop-shadow">
                       {cat.name}
                     </span>
                     <div className="absolute right-2 bottom-2 text-white/30 group-hover:text-white/60 transition-colors">
-                      <Music className="w-8 h-8 sm:w-12 sm:h-12 rotate-12" />
+                      <Music className="w-6 h-6 sm:w-10 sm:h-10 rotate-12" />
                     </div>
                   </div>
                 ))}
