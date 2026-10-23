@@ -71,12 +71,13 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
     const lrcUrl = baseUrl + encodeURIComponent(lrcPath);
 
     const fetchLyrics = async () => {
-      // If it's a YouTube track, fetch from LRCLIB first
+      // If it's a YouTube track, fetch from LRCLIB first with YouTube fallback
       if (currentTrack.source === 'yt' || !currentTrack.path.includes('.')) {
         try {
           const cleanTitle = currentTrack.title.replace(/\(.*?\)|\[.*?\]/g, '').trim();
           const cleanArtist = currentTrack.artist.replace(/\(.*?\)|\[.*?\]/g, '').trim();
-          const lrclibUrl = `/api/lyrics?title=${encodeURIComponent(cleanTitle)}&artist=${encodeURIComponent(cleanArtist)}&duration=${Math.round(currentTrack.duration || 0)}`;
+          const vid = currentTrack.path || (currentTrack.id || '').replace(/^yt_/, '');
+          const lrclibUrl = `/api/lyrics?title=${encodeURIComponent(cleanTitle)}&artist=${encodeURIComponent(cleanArtist)}&duration=${Math.round(currentTrack.duration || 0)}&videoId=${encodeURIComponent(vid)}`;
           const lrclibRes = await fetch(lrclibUrl, { signal: controller.signal });
           if (lrclibRes.ok) {
             const lrcData = await lrclibRes.json();
@@ -136,11 +137,12 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
         if (err.name === 'AbortError') return;
       }
 
-      // 3. Fallback to LRCLIB if not already checked
+      // 3. Fallback to LRCLIB / YouTube Music if not already checked
       try {
         const cleanTitle = currentTrack.title.replace(/\(.*?\)|\[.*?\]/g, '').trim();
         const cleanArtist = currentTrack.artist.replace(/\(.*?\)|\[.*?\]/g, '').trim();
-        const lrclibUrl = `/api/lyrics?title=${encodeURIComponent(cleanTitle)}&artist=${encodeURIComponent(cleanArtist)}&duration=${Math.round(currentTrack.duration || 0)}`;
+        const vid = currentTrack.path || (currentTrack.id || '').replace(/^yt_/, '');
+        const lrclibUrl = `/api/lyrics?title=${encodeURIComponent(cleanTitle)}&artist=${encodeURIComponent(cleanArtist)}&duration=${Math.round(currentTrack.duration || 0)}&videoId=${encodeURIComponent(vid)}`;
         const lrclibRes = await fetch(lrclibUrl, { signal: controller.signal });
         if (lrclibRes.ok) {
           const lrcData = await lrclibRes.json();

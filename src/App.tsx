@@ -181,17 +181,19 @@ export default function App() {
     } catch {}
 
     const handleVisibilityBlock = (e: Event) => {
-      const target = e.target as HTMLElement;
-      if (target?.id === 'youtube-player-mount' || target?.tagName === 'IFRAME') {
-        e.stopImmediatePropagation();
-      }
+      // Prevent browser from broadcasting background suspension events to players
+      e.stopImmediatePropagation();
     };
 
+    document.addEventListener('visibilitychange', handleVisibilityBlock, true);
+    document.addEventListener('webkitvisibilitychange', handleVisibilityBlock, true);
     window.addEventListener('visibilitychange', handleVisibilityBlock, true);
     window.addEventListener('webkitvisibilitychange', handleVisibilityBlock, true);
     window.addEventListener('blur', handleVisibilityBlock, true);
 
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityBlock, true);
+      document.removeEventListener('webkitvisibilitychange', handleVisibilityBlock, true);
       window.removeEventListener('visibilitychange', handleVisibilityBlock, true);
       window.removeEventListener('webkitvisibilitychange', handleVisibilityBlock, true);
       window.removeEventListener('blur', handleVisibilityBlock, true);
