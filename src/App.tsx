@@ -38,6 +38,52 @@ declare global {
   }
 }
 
+// Generate a real 5-second 8000Hz 8-bit mono PCM WAV blob for the native audio carrier.
+// Mobile Chrome and Android AudioFlinger require real PCM frames to maintain CPU PARTIAL_WAKE_LOCK and lock-screen MediaSession.
+function createSilentCarrierUrl(): string {
+  try {
+    const sampleRate = 8000;
+    const durationSeconds = 5;
+    const numSamples = sampleRate * durationSeconds;
+    const buffer = new Uint8Array(44 + numSamples);
+    const view = new DataView(buffer.buffer);
+
+    view.setUint32(0, 0x52494646, false); // "RIFF"
+    view.setUint32(4, 36 + numSamples, true);
+    view.setUint32(8, 0x57415645, false); // "WAVE"
+    view.setUint32(12, 0x666d7420, false); // "fmt "
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true); // PCM format
+    view.setUint16(22, 1, true); // mono
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate, true);
+    view.setUint16(32, 1, true);
+    view.setUint16(34, 8, true); // 8-bit
+    view.setUint32(36, 0x64617461, false); // "data"
+    view.setUint32(40, numSamples, true);
+    buffer.fill(128, 44); // 8-bit unsigned PCM silence = 128 (digital zero)
+
+    const blob = new Blob([buffer], { type: 'audio/wav' });
+    return URL.createObjectURL(blob);
+  } catch {
+    return 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+  }
+}
+
+const SILENT_CARRIER_URL = typeof window !== 'undefined' ? createSilentCarrierUrl() : '';
+
+function toAbsoluteUrl(url?: string | null): string {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+    return url;
+  }
+  try {
+    return new URL(url, window.location.origin).href;
+  } catch {
+    return url;
+  }
+}
+
 export default function App() {
   // Navigation & View States
   const [activeTab, setActiveTab] = useState<ActiveTab>('home');
@@ -119,9 +165,38 @@ export default function App() {
   const [isCreatePlaylistOpen, setIsCreatePlaylistOpen] = useState(false);
   const [addToPlaylistTrack, setAddToPlaylistTrack] = useState<Track | null>(null);
 
-  // Silent 1-second audio carrier for native background playback and Lock-Screen MediaSession
-  const SILENT_AUDIO_WAV =
-    'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+  const silentCarrierUrlRef = useRef<string>(SILENT_CARRIER_URL);
+
+  // Prevent mobile Chrome and background throttling from freezing playback on screen lock / tab blur
+  useEffect(() => {
+    try {
+      Object.defineProperty(document, 'hidden', {
+        get: () => false,
+        configurable: true,
+      });
+      Object.defineProperty(document, 'visibilityState', {
+        get: () => 'visible',
+        configurable: true,
+      });
+    } catch {}
+
+    const handleVisibilityBlock = (e: Event) => {
+      const target = e.target as HTMLElement;
+      if (target?.id === 'youtube-player-mount' || target?.tagName === 'IFRAME') {
+        e.stopImmediatePropagation();
+      }
+    };
+
+    window.addEventListener('visibilitychange', handleVisibilityBlock, true);
+    window.addEventListener('webkitvisibilitychange', handleVisibilityBlock, true);
+    window.addEventListener('blur', handleVisibilityBlock, true);
+
+    return () => {
+      window.removeEventListener('visibilitychange', handleVisibilityBlock, true);
+      window.removeEventListener('webkitvisibilitychange', handleVisibilityBlock, true);
+      window.removeEventListener('blur', handleVisibilityBlock, true);
+    };
+  }, []);
 
   // Audio Ref — rendered as a real DOM element below
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -194,10 +269,13 @@ export default function App() {
         // Keep native audio element actively playing with silent carrier so mobile OS keeps background audio alive & shows lock screen media session
         const audio = audioRef.current;
         if (audio) {
-          if (audio.src !== SILENT_AUDIO_WAV) {
-            audio.src = SILENT_AUDIO_WAV;
+          const carrierUrl = silentCarrierUrlRef.current || SILENT_CARRIER_URL;
+          if (audio.src !== carrierUrl) {
+            audio.src = carrierUrl;
             audio.loop = true;
           }
+          audio.volume = 0.05;
+          audio.muted = false;
           audio.play().catch(() => {});
         }
 
@@ -213,7 +291,13 @@ export default function App() {
           pendingYtTrackRef.current = track;
         }
 
+        isPlayingRef.current = true;
         setIsPlaying(true);
+        if ('mediaSession' in navigator) {
+          try {
+            navigator.mediaSession.playbackState = 'playing';
+          } catch {}
+        }
         if (track.duration && track.duration > 0) {
           setDuration(track.duration);
         }
@@ -238,7 +322,28 @@ export default function App() {
           audio
             .play()
             .then(() => {
+              isPlayingRef.current = true;
               setIsPlaying(true);
+              if ('mediaSession' in navigator) {
+                try {
+                  const highResCover = getHighResCoverUrl(track.coverArtUrl, track.path);
+                  const resolvedArtwork = toAbsoluteUrl(highResCover || track.coverArtUrl || '/pwa-512x512.png');
+                  navigator.mediaSession.metadata = new MediaMetadata({
+                    title: track.title || 'Unknown Title',
+                    artist: track.artist || 'AyushMuzic',
+                    album: track.album || 'AyushMuzic',
+                    artwork: resolvedArtwork
+                      ? [
+                          { src: resolvedArtwork, sizes: '512x512', type: 'image/jpeg' },
+                          { src: resolvedArtwork, sizes: '256x256', type: 'image/jpeg' },
+                          { src: resolvedArtwork, sizes: '192x192', type: 'image/jpeg' },
+                          { src: resolvedArtwork, sizes: '96x96', type: 'image/jpeg' },
+                        ]
+                      : [],
+                  });
+                  navigator.mediaSession.playbackState = 'playing';
+                } catch {}
+              }
               document.title = `${track.title} • ${track.artist || 'AyushMuzic'}`;
             })
             .catch((err) => {
@@ -246,6 +351,7 @@ export default function App() {
                 console.error('Play error:', err);
                 addToast(`Failed to play ${track.title}.`, 'error');
               }
+              isPlayingRef.current = false;
               setIsPlaying(false);
             });
         }
@@ -621,13 +727,28 @@ export default function App() {
             },
             onStateChange: (event: any) => {
               if (event.data === window.YT.PlayerState.PLAYING) {
+                isPlayingRef.current = true;
                 setIsPlaying(true);
                 const dur = event.target.getDuration();
                 if (dur && !isNaN(dur) && dur > 0) {
                   setDuration(dur);
                 }
+                const audio = audioRef.current;
+                if (audio && audio.paused) {
+                  audio.play().catch(() => {});
+                }
               } else if (event.data === window.YT.PlayerState.PAUSED) {
-                setIsPlaying(false);
+                if (isPlayingRef.current) {
+                  try {
+                    event.target.playVideo();
+                  } catch {}
+                  const audio = audioRef.current;
+                  if (audio && audio.paused) {
+                    audio.play().catch(() => {});
+                  }
+                } else {
+                  setIsPlaying(false);
+                }
               } else if (event.data === window.YT.PlayerState.ENDED) {
                 if (repeatModeRef.current === 'one' && currentTrackRef.current) {
                   event.target.seekTo(0, true);
@@ -660,6 +781,17 @@ export default function App() {
     ticker = setInterval(() => {
       if (isYtTrackActiveRef.current && ytPlayerRef.current && typeof ytPlayerRef.current.getCurrentTime === 'function') {
         try {
+          if (isPlayingRef.current && typeof ytPlayerRef.current.getPlayerState === 'function') {
+            const st = ytPlayerRef.current.getPlayerState();
+            if (st === 2) {
+              ytPlayerRef.current.playVideo();
+            }
+          }
+          const audio = audioRef.current;
+          if (isPlayingRef.current && audio && audio.paused) {
+            audio.play().catch(() => {});
+          }
+
           const t = ytPlayerRef.current.getCurrentTime();
           const d = ytPlayerRef.current.getDuration();
           if (typeof t === 'number' && !isNaN(t) && t >= 0) {
@@ -977,54 +1109,70 @@ export default function App() {
         try {
           const state = yt.getPlayerState();
           if (state === 1) {
+            isPlayingRef.current = false;
+            setIsPlaying(false);
             yt.pauseVideo();
             if (audio) audio.pause();
-            setIsPlaying(false);
           } else {
+            isPlayingRef.current = true;
+            setIsPlaying(true);
             yt.playVideo();
             if (audio) {
-              if (audio.src !== SILENT_AUDIO_WAV) {
-                audio.src = SILENT_AUDIO_WAV;
+              const carrierUrl = silentCarrierUrlRef.current || SILENT_CARRIER_URL;
+              if (audio.src !== carrierUrl) {
+                audio.src = carrierUrl;
                 audio.loop = true;
               }
+              audio.volume = 0.05;
+              audio.muted = false;
               audio.play().catch(() => {});
             }
-            setIsPlaying(true);
           }
         } catch {
           if (isPlaying) {
+            isPlayingRef.current = false;
+            setIsPlaying(false);
             yt.pauseVideo();
             if (audio) audio.pause();
-            setIsPlaying(false);
           } else {
+            isPlayingRef.current = true;
+            setIsPlaying(true);
             yt.playVideo();
             if (audio) {
-              if (audio.src !== SILENT_AUDIO_WAV) {
-                audio.src = SILENT_AUDIO_WAV;
+              const carrierUrl = silentCarrierUrlRef.current || SILENT_CARRIER_URL;
+              if (audio.src !== carrierUrl) {
+                audio.src = carrierUrl;
                 audio.loop = true;
               }
+              audio.volume = 0.05;
+              audio.muted = false;
               audio.play().catch(() => {});
             }
-            setIsPlaying(true);
           }
         }
       } else {
-        setIsPlaying((prev) => !prev);
+        setIsPlaying((prev) => {
+          isPlayingRef.current = !prev;
+          return !prev;
+        });
       }
     } else {
       const audio = audioRef.current;
       if (!audio) return;
 
       if (isPlaying) {
+        isPlayingRef.current = false;
         audio.pause();
         setIsPlaying(false);
       } else {
+        isPlayingRef.current = true;
         audio
           .play()
           .then(() => {
             setIsPlaying(true);
           })
           .catch((err) => {
+            isPlayingRef.current = false;
             if (!isBenignPlayError(err)) {
               console.error('Play error:', err);
               addToast('Playback blocked or failed.', 'error');
@@ -1277,18 +1425,6 @@ export default function App() {
     };
   }, [handleTogglePlayPause, handleSeek, handleToggleMute, duration]);
 
-  // Helper to ensure absolute URL for media session artwork (required by mobile OS notifications)
-  const toAbsoluteUrl = (url?: string | null) => {
-    if (!url) return '';
-    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
-      return url;
-    }
-    try {
-      return new URL(url, window.location.origin).href;
-    } catch {
-      return url;
-    }
-  };
 
   // Media Session API — provides lock-screen / notification controls, title, artist, and cover art
   useEffect(() => {
@@ -1369,25 +1505,26 @@ export default function App() {
         preload="auto"
         style={{
           position: 'fixed',
-          top: '-9999px',
-          left: '-9999px',
+          bottom: 0,
+          right: 0,
           width: '1px',
           height: '1px',
           opacity: 0.001,
           pointerEvents: 'none',
+          zIndex: -1,
         }}
       />
       <div
         id="youtube-player-mount"
         style={{
           position: 'fixed',
-          top: '-9999px',
-          left: '-9999px',
+          bottom: 0,
+          right: 0,
           width: '200px',
           height: '200px',
-          opacity: 1,
+          opacity: 0.001,
           pointerEvents: 'none',
-          zIndex: -999,
+          zIndex: -1,
         }}
       />
       <Toast toasts={toasts} onDismiss={dismissToast} />
