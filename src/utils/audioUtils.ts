@@ -33,11 +33,14 @@ export function isSafariBrowser(): boolean {
  * it. Every other browser keeps streaming straight from the CDN (faster,
  * no server hop, matches the bandwidth-optimization work already in place).
  */
-export function getStreamableAudioUrl(track: { path: string; audioUrl: string; source?: AudioSource }): string {
-  if (track.source === 'yt' || track.audioUrl?.startsWith('/api/stream')) {
+export function getStreamableAudioUrl(track: { path: string; audioUrl?: string; source?: AudioSource }): string {
+  if (track.audioUrl && (track.audioUrl.startsWith('/api/stream') || track.audioUrl.startsWith('http'))) {
     return track.audioUrl;
   }
-  if (!isSafariBrowser()) return track.audioUrl;
+  if (track.source === 'yt' || (!track.path.includes('.') && !track.path.includes('/') && track.path.length >= 8)) {
+    return `/api/stream?videoId=${encodeURIComponent(track.path)}`;
+  }
+  if (!isSafariBrowser()) return track.audioUrl || '';
   return `/api/audio?user=${encodeURIComponent(HF_CONFIG.HF_USER)}&repo=${encodeURIComponent(HF_CONFIG.HF_REPO)}&file=${encodeURIComponent(track.path)}`;
 }
 

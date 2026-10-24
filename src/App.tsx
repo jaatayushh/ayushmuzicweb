@@ -167,6 +167,34 @@ export default function App() {
 
   const silentCarrierUrlRef = useRef<string>(SILENT_CARRIER_URL);
 
+  // Screen Wake Lock API: Keep the mobile display awake while music is actively playing so playback doesn't get suspended
+  const wakeLockRef = useRef<any>(null);
+  useEffect(() => {
+    const acquireLock = async () => {
+      if ('wakeLock' in navigator && isPlaying) {
+        try {
+          if (!wakeLockRef.current) {
+            wakeLockRef.current = await (navigator as any).wakeLock.request('screen');
+          }
+        } catch {}
+      } else if (wakeLockRef.current && !isPlaying) {
+        try {
+          await wakeLockRef.current.release();
+        } catch {}
+        wakeLockRef.current = null;
+      }
+    };
+    acquireLock();
+    return () => {
+      if (wakeLockRef.current) {
+        try {
+          wakeLockRef.current.release();
+        } catch {}
+        wakeLockRef.current = null;
+      }
+    };
+  }, [isPlaying]);
+
   // Prevent mobile Chrome and background throttling from freezing playback on screen lock / tab blur
   useEffect(() => {
     try {
@@ -264,49 +292,72 @@ export default function App() {
     );
   }, []);
 
+  const playWithYouTubeFallback = useCallback((track: Track) => {
+    isYtTrackActiveRef.current = true;
+    const audio = audioRef.current;
+    if (audio) {
+      const carrierUrl = silentCarrierUrlRef.current || SILENT_CARRIER_URL;
+      if (audio.src !== carrierUrl) {
+        audio.src = carrierUrl;
+        audio.loop = true;
+      }
+      audio.volume = 0.05;
+      audio.muted = false;
+      audio.play().catch(() => {});
+    }
+
+    const yt = ytPlayerRef.current;
+    if (yt && isYtReadyRef.current && typeof yt.loadVideoById === 'function') {
+      try {
+        yt.loadVideoById({ videoId: track.path, startSeconds: 0 });
+        yt.playVideo();
+      } catch (e) {
+        console.warn('Error calling loadVideoById:', e);
+      }
+    } else {
+      pendingYtTrackRef.current = track;
+    }
+
+    isPlayingRef.current = true;
+    setIsPlaying(true);
+  }, []);
+
   const playTrackAudio = useCallback(
     (track: Track) => {
-      if (isYouTubeTrack(track)) {
-        isYtTrackActiveRef.current = true;
-        // Keep native audio element actively playing with silent carrier so mobile OS keeps background audio alive & shows lock screen media session
-        const audio = audioRef.current;
-        if (audio) {
-          const carrierUrl = silentCarrierUrlRef.current || SILENT_CARRIER_URL;
-          if (audio.src !== carrierUrl) {
-            audio.src = carrierUrl;
-            audio.loop = true;
-          }
-          audio.volume = 0.05;
-          audio.muted = false;
-          audio.play().catch(() => {});
-        }
+      // 1. Immediately update MediaSession metadata so mobile notifications & lock screen show Title, Artist & Album Art
+      if ('mediaSession' in navigator) {
+        try {
+          const highResCover = getHighResCoverUrl(track.coverArtUrl, track.path);
+          const resolvedArtwork = toAbsoluteUrl(highResCover || track.coverArtUrl || '/pwa-512x512.png');
+          navigator.mediaSession.metadata = new MediaMetadata({
+            title: track.title || 'Unknown Title',
+            artist: track.artist || 'AyushMuzic',
+            album: track.album || 'AyushMuzic',
+            artwork: resolvedArtwork
+              ? [
+                  { src: resolvedArtwork, sizes: '512x512', type: 'image/jpeg' },
+                  { src: resolvedArtwork, sizes: '256x256', type: 'image/jpeg' },
+                  { src: resolvedArtwork, sizes: '192x192', type: 'image/jpeg' },
+                  { src: resolvedArtwork, sizes: '96x96', type: 'image/jpeg' },
+                ]
+              : [],
+          });
+          navigator.mediaSession.playbackState = 'playing';
+        } catch {}
+      }
 
-        const yt = ytPlayerRef.current;
-        if (yt && isYtReadyRef.current && typeof yt.loadVideoById === 'function') {
-          try {
-            yt.loadVideoById({ videoId: track.path, startSeconds: 0 });
-            yt.playVideo();
-          } catch (e) {
-            console.warn('Error calling loadVideoById:', e);
-          }
-        } else {
-          pendingYtTrackRef.current = track;
-        }
+      document.title = `${track.title} • ${track.artist || 'AyushMuzic'}`;
+      if (track.duration && track.duration > 0) {
+        setDuration(track.duration);
+      }
 
-        isPlayingRef.current = true;
-        setIsPlaying(true);
-        if ('mediaSession' in navigator) {
-          try {
-            navigator.mediaSession.playbackState = 'playing';
-          } catch {}
-        }
-        if (track.duration && track.duration > 0) {
-          setDuration(track.duration);
-        }
-        document.title = `${track.title} • ${track.artist || 'AyushMuzic'}`;
-      } else {
+      // 2. Determine native audio stream URL
+      const streamUrl = track.audioUrl || getStreamableAudioUrl(track);
+
+      // 3. Native HTML5 <audio> (provides true background audio on mobile Chrome & iOS Safari, accurate lyrics sync)
+      const audio = audioRef.current;
+      if (audio && streamUrl) {
         isYtTrackActiveRef.current = false;
-        // Pause YouTube player
         const yt = ytPlayerRef.current;
         if (yt && typeof yt.pauseVideo === 'function') {
           try {
@@ -314,52 +365,38 @@ export default function App() {
           } catch {}
         }
 
-        const audio = audioRef.current;
-        if (audio) {
-          audio.loop = false;
-          const streamUrl = track.audioUrl || getStreamableAudioUrl(track);
-          audio.src = streamUrl;
-          audio.currentTime = 0;
-          audio.load();
-          audio
-            .play()
-            .then(() => {
-              isPlayingRef.current = true;
-              setIsPlaying(true);
-              if ('mediaSession' in navigator) {
-                try {
-                  const highResCover = getHighResCoverUrl(track.coverArtUrl, track.path);
-                  const resolvedArtwork = toAbsoluteUrl(highResCover || track.coverArtUrl || '/pwa-512x512.png');
-                  navigator.mediaSession.metadata = new MediaMetadata({
-                    title: track.title || 'Unknown Title',
-                    artist: track.artist || 'AyushMuzic',
-                    album: track.album || 'AyushMuzic',
-                    artwork: resolvedArtwork
-                      ? [
-                          { src: resolvedArtwork, sizes: '512x512', type: 'image/jpeg' },
-                          { src: resolvedArtwork, sizes: '256x256', type: 'image/jpeg' },
-                          { src: resolvedArtwork, sizes: '192x192', type: 'image/jpeg' },
-                          { src: resolvedArtwork, sizes: '96x96', type: 'image/jpeg' },
-                        ]
-                      : [],
-                  });
-                  navigator.mediaSession.playbackState = 'playing';
-                } catch {}
-              }
-              document.title = `${track.title} • ${track.artist || 'AyushMuzic'}`;
-            })
-            .catch((err) => {
-              if (!isBenignPlayError(err)) {
-                console.error('Play error:', err);
+        audio.loop = false;
+        audio.src = streamUrl;
+        audio.currentTime = 0;
+        audio.load();
+        audio
+          .play()
+          .then(() => {
+            isPlayingRef.current = true;
+            setIsPlaying(true);
+            if ('mediaSession' in navigator) {
+              try {
+                navigator.mediaSession.playbackState = 'playing';
+              } catch {}
+            }
+          })
+          .catch((err) => {
+            if (!isBenignPlayError(err)) {
+              console.warn('Native audio play error, trying YouTube fallback:', err);
+              if (isYouTubeTrack(track)) {
+                playWithYouTubeFallback(track);
+              } else {
                 addToast(`Failed to play ${track.title}.`, 'error');
+                isPlayingRef.current = false;
+                setIsPlaying(false);
               }
-              isPlayingRef.current = false;
-              setIsPlaying(false);
-            });
-        }
+            }
+          });
+      } else if (isYouTubeTrack(track)) {
+        playWithYouTubeFallback(track);
       }
     },
-    [isYouTubeTrack, isBenignPlayError, addToast]
+    [isYouTubeTrack, isBenignPlayError, addToast, playWithYouTubeFallback]
   );
 
   const markTrackAsPlayed = useCallback((trackId: string) => {
@@ -634,6 +671,12 @@ export default function App() {
 
     const handleAudioError = (e: Event) => {
       if (isYtTrackActiveRef.current) return;
+      const track = currentTrackRef.current;
+      if (track && isYouTubeTrack(track)) {
+        console.warn('Native stream error, falling back to YouTube Iframe player...');
+        playWithYouTubeFallback(track);
+        return;
+      }
       console.error('Audio playback error:', e);
       addToast('Error loading audio stream. Skipping to next track...', 'error');
       setIsPlaying(false);
@@ -653,7 +696,7 @@ export default function App() {
       audio.removeEventListener('progress', handleProgress);
       audio.removeEventListener('error', handleAudioError);
     };
-  }, [addToast]);
+  }, [addToast, isYouTubeTrack, playWithYouTubeFallback]);
 
   // Audio Ended Listener
   useEffect(() => {
@@ -740,16 +783,13 @@ export default function App() {
                   audio.play().catch(() => {});
                 }
               } else if (event.data === window.YT.PlayerState.PAUSED) {
-                if (isPlayingRef.current) {
+                // When player pauses (user pause or screen off), keep UI & lock screen state perfectly in sync
+                isPlayingRef.current = false;
+                setIsPlaying(false);
+                if ('mediaSession' in navigator) {
                   try {
-                    event.target.playVideo();
+                    navigator.mediaSession.playbackState = 'paused';
                   } catch {}
-                  const audio = audioRef.current;
-                  if (audio && audio.paused) {
-                    audio.play().catch(() => {});
-                  }
-                } else {
-                  setIsPlaying(false);
                 }
               } else if (event.data === window.YT.PlayerState.ENDED) {
                 if (repeatModeRef.current === 'one' && currentTrackRef.current) {
@@ -783,17 +823,6 @@ export default function App() {
     ticker = setInterval(() => {
       if (isYtTrackActiveRef.current && ytPlayerRef.current && typeof ytPlayerRef.current.getCurrentTime === 'function') {
         try {
-          if (isPlayingRef.current && typeof ytPlayerRef.current.getPlayerState === 'function') {
-            const st = ytPlayerRef.current.getPlayerState();
-            if (st === 2) {
-              ytPlayerRef.current.playVideo();
-            }
-          }
-          const audio = audioRef.current;
-          if (isPlayingRef.current && audio && audio.paused) {
-            audio.play().catch(() => {});
-          }
-
           const t = ytPlayerRef.current.getCurrentTime();
           const d = ytPlayerRef.current.getDuration();
           if (typeof t === 'number' && !isNaN(t) && t >= 0) {
@@ -1459,7 +1488,28 @@ export default function App() {
     if (!('mediaSession' in navigator)) return;
 
     // Use ref-based handlers so we never recreate listeners on every state change and avoid stale closures
-    navigator.mediaSession.setActionHandler('play', () => handleTogglePlayPauseRef.current());
+    navigator.mediaSession.setActionHandler('play', () => {
+      // Remote resume from lock screen notification or Bluetooth headphone
+      const yt = ytPlayerRef.current;
+      if (isYtTrackActiveRef.current && yt && typeof yt.playVideo === 'function') {
+        isPlayingRef.current = true;
+        setIsPlaying(true);
+        try {
+          yt.playVideo();
+        } catch {}
+        if ('mediaSession' in navigator) {
+          try {
+            navigator.mediaSession.playbackState = 'playing';
+          } catch {}
+        }
+        const audio = audioRef.current;
+        if (audio) {
+          audio.play().catch(() => {});
+        }
+      } else {
+        handleTogglePlayPauseRef.current();
+      }
+    });
     navigator.mediaSession.setActionHandler('pause', () => handleTogglePlayPauseRef.current());
     navigator.mediaSession.setActionHandler('previoustrack', () => handlePrevTrackRef.current());
     navigator.mediaSession.setActionHandler('nexttrack', () => handleNextTrackRef.current());

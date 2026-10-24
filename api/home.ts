@@ -11,7 +11,6 @@ async function getYT() {
   if (!ytInstance) {
     ytInstance = await Innertube.create({
       cache: new UniversalCache(false),
-      generate_session_locally: true,
     });
   }
   return ytInstance;

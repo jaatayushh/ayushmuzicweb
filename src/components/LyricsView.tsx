@@ -27,6 +27,14 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
+  const userScrollTimerRef = useRef<any>(null);
+  const handleUserScroll = useCallback(() => {
+    setAutoScroll(false);
+    if (userScrollTimerRef.current) clearTimeout(userScrollTimerRef.current);
+    userScrollTimerRef.current = setTimeout(() => {
+      setAutoScroll(true);
+    }, 3500);
+  }, []);
   const [lyricsData, setLyricsData] = useState<LyricsData | null>(null);
   const [fetchState, setFetchState] = useState<FetchState>('idle');
   const fetchAbortRef = useRef<AbortController | null>(null);
@@ -184,13 +192,18 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
 
   // Animation Loop for Syncing
   const requestRef = useRef<number>();
+  const currentTimeRef = useRef(currentTime);
+  currentTimeRef.current = currentTime;
   
   useEffect(() => {
     if (!lyricsData || lyricsData.lines.length === 0) return;
 
     const updateSync = () => {
-      // Get the most accurate time
-      const time = audioRef?.current ? audioRef.current.currentTime : currentTime;
+      // Get the most accurate time: ignore silent carrier audio elements
+      const isSilentCarrier = audioRef?.current?.src?.includes('data:') || audioRef?.current?.src?.includes('blob:');
+      const time = (!isSilentCarrier && audioRef?.current && !isNaN(audioRef.current.currentTime) && audioRef.current.currentTime > 0)
+        ? audioRef.current.currentTime
+        : (currentTimeRef.current ?? currentTime ?? 0);
 
       // 1. Find active line
       let newActiveIndex = -1;
@@ -267,6 +280,17 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
       }
     };
   }, [lyricsData, isPlaying, currentTime, autoScroll, audioRef]);
+
+  useEffect(() => {
+    if (autoScroll && activeIndex >= 0 && containerRef.current) {
+      const lineEl = containerRef.current.querySelector(
+        `[data-lyric-index="${activeIndex}"]`
+      ) as HTMLElement;
+      if (lineEl) {
+        lineEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, [autoScroll, activeIndex]);
 
 
   if (!currentTrack) {
@@ -373,8 +397,8 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
       {/* BODY */}
       <div
         ref={containerRef}
-        onWheel={() => setAutoScroll(false)}
-        onTouchMove={() => setAutoScroll(false)}
+        onWheel={handleUserScroll}
+        onTouchMove={handleUserScroll}
         className="relative z-10 flex-1 overflow-y-auto"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
