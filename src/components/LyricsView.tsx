@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { Track } from '../types';
 import { parseLrc, parseYamlLyrics, LyricsData } from '../utils/lyricsParser';
 import { Sparkles, Music, Mic2, Play, Pause, AlignCenter, Loader2 } from 'lucide-react';
@@ -191,8 +191,8 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
   }, [currentTrack, rawLrcData]);
 
   // Animation Loop for Syncing
-  const requestRef = useRef<number>();
-  const currentTimeRef = useRef(currentTime);
+  const requestRef = useRef<number | undefined>(undefined);
+  const currentTimeRef = useRef<number>(currentTime);
   currentTimeRef.current = currentTime;
   
   useEffect(() => {

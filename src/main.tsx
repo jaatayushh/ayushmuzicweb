@@ -18,19 +18,20 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-class ErrorBoundary extends (Component as any) {
-  constructor(props: any) {
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
       hasError: false,
+      error: null,
     };
   }
 
-  public static getDerivedStateFromError(): any {
-    return { hasError: true };
+  public static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
   }
 
-  public componentDidCatch(error: any, errorInfo: any) {
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('AyushMuzic Player Uncaught Error:', error, errorInfo);
   }
 
