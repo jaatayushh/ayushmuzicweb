@@ -279,7 +279,7 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
         cancelAnimationFrame(requestRef.current);
       }
     };
-  }, [lyricsData, isPlaying, currentTime, autoScroll, audioRef]);
+  }, [lyricsData, isPlaying, autoScroll, audioRef]);
 
   useEffect(() => {
     if (autoScroll && activeIndex >= 0 && containerRef.current) {

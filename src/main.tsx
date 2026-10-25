@@ -4,8 +4,11 @@ import App from './App.tsx';
 import './index.css';
 import { registerSW } from 'virtual:pwa-register';
 
-registerSW({
-  onNeedRefresh() {},
+const updateSW = registerSW({
+  immediate: true,
+  onNeedRefresh() {
+    updateSW(true);
+  },
   onOfflineReady() {},
 });
 
@@ -68,7 +71,23 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             An unexpected error occurred while loading the player. Tap below to reload.
           </p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={async () => {
+              try {
+                if ('serviceWorker' in navigator) {
+                  const registrations = await navigator.serviceWorker.getRegistrations();
+                  for (const r of registrations) {
+                    await r.unregister();
+                  }
+                }
+                if ('caches' in window) {
+                  const cacheKeys = await caches.keys();
+                  for (const key of cacheKeys) {
+                    await caches.delete(key);
+                  }
+                }
+              } catch {}
+              window.location.reload();
+            }}
             style={{
               background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
               color: '#ffffff',

@@ -351,10 +351,14 @@ export default function App() {
         setDuration(track.duration);
       }
 
-      // 2. Determine native audio stream URL
-      const streamUrl = track.audioUrl || getStreamableAudioUrl(track);
+      // If it's a YouTube track, play directly via YouTube Player engine (avoids datacenter 404 blocking)
+      if (isYouTubeTrack(track)) {
+        playWithYouTubeFallback(track);
+        return;
+      }
 
-      // 3. Native HTML5 <audio> (provides true background audio on mobile Chrome & iOS Safari, accurate lyrics sync)
+      // Native HTML5 <audio> (for Hugging Face library tracks with direct audio files)
+      const streamUrl = track.audioUrl || getStreamableAudioUrl(track);
       const audio = audioRef.current;
       if (audio && streamUrl) {
         isYtTrackActiveRef.current = false;
@@ -382,18 +386,12 @@ export default function App() {
           })
           .catch((err) => {
             if (!isBenignPlayError(err)) {
-              console.warn('Native audio play error, trying YouTube fallback:', err);
-              if (isYouTubeTrack(track)) {
-                playWithYouTubeFallback(track);
-              } else {
-                addToast(`Failed to play ${track.title}.`, 'error');
-                isPlayingRef.current = false;
-                setIsPlaying(false);
-              }
+              console.error('Play error:', err);
+              addToast(`Failed to play ${track.title}.`, 'error');
+              isPlayingRef.current = false;
+              setIsPlaying(false);
             }
           });
-      } else if (isYouTubeTrack(track)) {
-        playWithYouTubeFallback(track);
       }
     },
     [isYouTubeTrack, isBenignPlayError, addToast, playWithYouTubeFallback]
@@ -783,13 +781,22 @@ export default function App() {
                   audio.play().catch(() => {});
                 }
               } else if (event.data === window.YT.PlayerState.PAUSED) {
-                // When player pauses (user pause or screen off), keep UI & lock screen state perfectly in sync
-                isPlayingRef.current = false;
-                setIsPlaying(false);
-                if ('mediaSession' in navigator) {
+                // Background suspension watchdog: if Chrome paused video on screen lock/blur but user didn't request pause, resume
+                if (isPlayingRef.current) {
                   try {
-                    navigator.mediaSession.playbackState = 'paused';
+                    event.target.playVideo();
                   } catch {}
+                  const audio = audioRef.current;
+                  if (audio && audio.paused) {
+                    audio.play().catch(() => {});
+                  }
+                } else {
+                  setIsPlaying(false);
+                  if ('mediaSession' in navigator) {
+                    try {
+                      navigator.mediaSession.playbackState = 'paused';
+                    } catch {}
+                  }
                 }
               } else if (event.data === window.YT.PlayerState.ENDED) {
                 if (repeatModeRef.current === 'one' && currentTrackRef.current) {
@@ -823,6 +830,19 @@ export default function App() {
     ticker = setInterval(() => {
       if (isYtTrackActiveRef.current && ytPlayerRef.current && typeof ytPlayerRef.current.getCurrentTime === 'function') {
         try {
+          if (isPlayingRef.current && typeof ytPlayerRef.current.getPlayerState === 'function') {
+            const st = ytPlayerRef.current.getPlayerState();
+            if (st === 2) {
+              try {
+                ytPlayerRef.current.playVideo();
+              } catch {}
+            }
+          }
+          const audio = audioRef.current;
+          if (isPlayingRef.current && audio && audio.paused) {
+            audio.play().catch(() => {});
+          }
+
           const t = ytPlayerRef.current.getCurrentTime();
           const d = ytPlayerRef.current.getDuration();
           if (typeof t === 'number' && !isNaN(t) && t >= 0) {
@@ -858,7 +878,7 @@ export default function App() {
           }
         } catch {}
       }
-    }, 250);
+    }, 100);
 
     return () => {
       if (ticker) clearInterval(ticker);
